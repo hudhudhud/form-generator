@@ -31,14 +31,12 @@ const layouts = {
     return (
       <el-col span={config.span} class={className}
         nativeOnClick={event => { activeItem(currentItem); event.stopPropagation() }}>
-        <el-form-item label-width={labelWidth}
-          label={config.showLabel ? config.label : ''} required={config.required}>
+       
           <render key={config.renderKey} conf={currentItem} onInput={ event => {
             this.$set(config, 'defaultValue', event)
           }}>
             {child}
           </render>
-        </el-form-item>
         {components.itemBtns.apply(this, arguments)}
       </el-col>
     )
@@ -57,11 +55,11 @@ const layouts = {
     }
     return (
       <el-col span={config.span}>
-        <el-row gutter={config.gutter} class={className}
+        <el-row gutter={currentItem.gutter} class={className}
           nativeOnClick={event => { activeItem(currentItem); event.stopPropagation() }}>
-          <span class="component-name">{config.componentName}</span>
-          <draggable list={config.children || []} animation={340}
-            group="componentsGroup" class="drag-wrapper">
+          <span class="component-name">{config.title}</span>
+          <draggable list={config.params || []} animation={340}
+            group="componentsGroup" class={"drag-wrapper " + config.mode}>
             {child}
           </draggable>
           {components.itemBtns.apply(this, arguments)}
@@ -82,24 +80,24 @@ const layouts = {
 
 function renderChildren(h, currentItem, index, list) {
   const config = currentItem.__config__
-  if (!Array.isArray(config.children)) return null
-  return config.children.map((el, i) => {
-    const layout = layouts[el.__config__.layout]
+  if (!Array.isArray(config.params)) return null
+  return config.params.map((el, i) => {
+    const layout = layouts[el.layout?el.layout:'colFormItem']
     if (layout) {
-      return layout.call(this, h, el, i, config.children)
+      return layout.call(this, h, el, i, config.params)
     }
     return layoutIsNotFound.call(this)
   })
 }
 
 function layoutIsNotFound() {
-  throw new Error(`没有与${this.currentItem.__config__.layout}匹配的layout`)
+  throw new Error(`没有与${this.currentItem.layout}匹配的layout`)
 }
 
 export default {
   components: {
     render,
-    draggable
+    draggable,
   },
   props: [
     'currentItem',
@@ -109,7 +107,7 @@ export default {
     'formConf'
   ],
   render(h) {
-    const layout = layouts[this.currentItem.__config__.layout]
+    const layout = layouts[this.currentItem.layout?this.currentItem.layout:'colFormItem']
 
     if (layout) {
       return layout.call(this, h, this.currentItem, this.index, this.drawingList)

@@ -16,6 +16,7 @@ $lighterBlue: #409EFF;
     width: 48%;
     margin: 1%;
     transition: transform 0ms !important;
+    cursor:move;
   }
 }
 .components-draggable{
@@ -35,7 +36,7 @@ $lighterBlue: #409EFF;
   padding: 8px 10px;
   background: $selectedColor;
   font-size: 12px;
-  cursor: move;
+  // cursor: move;
   border: 1px dashed $selectedColor;
   border-radius: 3px;
   .svg-icon{
@@ -63,16 +64,17 @@ $lighterBlue: #409EFF;
   overflow: hidden;
 }
 .center-scrollbar {
-  height: calc(100vh - 42px);
+  height: 580px; //calc(100vh - 42px);
   overflow: hidden;
   border-left: 1px solid #f1e8e8;
   border-right: 1px solid #f1e8e8;
   box-sizing: border-box;
+  background-color:#fff;
 }
 .center-board {
   height: 100vh;
   width: auto;
-  margin: 0 350px 0 260px;
+  margin: 0 400px 0 260px;
   box-sizing: border-box;
 }
 .empty-info{
@@ -130,11 +132,12 @@ $lighterBlue: #409EFF;
 }
 
 .center-board-row {
-  padding: 12px 12px 15px 12px;
+  // padding: 12px 12px 15px 12px;
   box-sizing: border-box;
   & > .el-form {
     // 69 = 12+15+42
-    height: calc(100vh - 69px);
+    // height: calc(100vh - 69px);
+    height:580px;
   }
 }
 .drawing-board {
@@ -183,7 +186,7 @@ $lighterBlue: #409EFF;
 }
 .drawing-item{
   position: relative;
-  cursor: move;
+  // cursor: move;
   &.unfocus-bordered:not(.active-from-item) > div:first-child {
     border: 1px dashed #ccc;
   }
@@ -193,7 +196,7 @@ $lighterBlue: #409EFF;
 }
 .drawing-row-item{
   position: relative;
-  cursor: move;
+  // cursor: move;
   box-sizing: border-box;
   border: 1px dashed #ccc;
   border-radius: 3px;
@@ -202,14 +205,30 @@ $lighterBlue: #409EFF;
   .drawing-row-item {
     margin-bottom: 2px;
   }
-  .el-col{
-    margin-top: 22px;
+  // .el-col{
+  //   margin-top: 22px;
+  // }
+  .el-col:first-child{
+    margin-top: 40px;
+  }
+  .el-col:last-child{
+    margin-bottom: 20px;
   }
   .el-form-item{
     margin-bottom: 0;
   }
   .drag-wrapper{
-    min-height: 80px;
+    // min-height: 200px;
+    // background-color:#CFD6DF;
+    &.simple{
+      min-height: 50px;
+    }
+    &.mutiple{
+      min-height: 200px;
+    }
+    &.pop{
+      min-height: 300px;
+    }
   }
   &.active-from-item{
     border: 1px dashed $lighterBlue;

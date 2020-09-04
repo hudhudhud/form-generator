@@ -1,4 +1,5 @@
 import { deepClone } from '@/utils/index'
+import FormComponents from '@/components/form-design/form-components'
 
 const componentChild = {}
 /**
@@ -52,12 +53,18 @@ function buildDataObject(confClone, dataObject) {
     if (key === '__vModel__') {
       vModel.call(this, dataObject, confClone.__config__.defaultValue)
     } else if (dataObject[key]) {
-      dataObject[key] = { ...dataObject[key], ...val }
+      // if(key=='props'){
+        
+      // }
+      // else{
+        dataObject[key] = { ...dataObject[key], ...val }
+      // }
     } else {
       dataObject.attrs[key] = val
     }
+    
+    dataObject['props']={item:confClone.__config__}
   })
-
   // 清理属性
   clearAttrs(dataObject)
 }
@@ -99,6 +106,12 @@ export default {
     // 将json表单配置转化为vue render可以识别的 “数据对象（dataObject）”
     buildDataObject.call(this, confClone, dataObject)
 
-    return h(this.conf.__config__.tag, dataObject, children)
+    // console.log(11111111111111,this.conf.__config__)
+    let tagName = "form-"+(this.conf.__config__.type).toLocaleLowerCase()
+    if(Object.keys(FormComponents).indexOf(tagName)==-1){
+      tagName='form-error'
+    }
+    // console.log(999999999,dataObject)
+    return h(tagName, dataObject, children)
   }
 }

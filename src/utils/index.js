@@ -141,3 +141,52 @@ export function deepClone(obj) {
 
   return result
 }
+
+
+/**
+ * 判断对象为空
+ * @param v
+ * @return {boolean}
+ */
+export const isEmpty = (v) => {
+  if (typeof v === 'undefined') {
+      return true
+  }
+  if (v === undefined || v === 'undefined') {
+      return true
+  }
+  if (v === null) {
+      return true
+  }
+  if (v === '' || v === 'null') {
+      return true
+  }
+  switch (typeof v) {
+      case 'string' :
+          if (v.trim().length === 0) {
+              return true
+          }
+          break
+      case 'object' :
+          return undefined !== v.length && v.length === 0
+  }
+  return false
+}
+
+import {Toast} from 'mint-ui'
+export const toast = {
+  /**
+   * toast 提示
+   * @param message 提示内容
+   * @param icon 添加图标
+   * @param position 提示显示位置
+   * @param duration 显示时间
+   * */
+  show(message, position = 'middle', duration = 1500) {
+      Toast({
+          message,
+          position,
+          duration
+      })
+  }
+}

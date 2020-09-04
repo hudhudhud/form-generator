@@ -10,10 +10,10 @@
           <i class="el-icon-document-copy" />
           复制JSON
         </span>
-        <span class="bar-btn" @click="exportJsonFile">
+        <!-- <span class="bar-btn" @click="exportJsonFile">
           <i class="el-icon-download" />
           导出JSON文件
-        </span>
+        </span> -->
         <span class="bar-btn delete-btn" @click="$emit('update:visible', false)">
           <i class="el-icon-circle-close" />
           关闭

@@ -33,8 +33,12 @@
                 @click="addComponent(element)"
               >
                 <div class="components-body">
-                  <svg-icon :icon-class="element.__config__.tagIcon" />
-                  {{ element.__config__.label }}
+                  <svg-icon :icon-class="element.__config__.type" />
+                  <span v-if='element.__config__.type=="hidden"'>hidden组件</span>
+                  <span v-else-if='element.__config__.type=="detail"'>
+                    {{element.modeType}}
+                  </span>
+                  <span v-else>{{element.__config__.label}}</span>
                 </div>
               </div>
             </draggable>
@@ -45,50 +49,64 @@
 
     <div class="center-board">
       <div class="action-bar">
-        <el-button icon="el-icon-video-play" type="text" @click="run">
+        <!-- <el-button icon="el-icon-video-play" type="text" @click="run">
           运行
-        </el-button>
-        <el-button icon="el-icon-view" type="text" @click="showJson">
-          查看json
-        </el-button>
-        <el-button icon="el-icon-download" type="text" @click="download">
+        </el-button> -->
+       
+        <!-- <el-button icon="el-icon-download" type="text" @click="download">
           导出vue文件
         </el-button>
         <el-button class="copy-btn-main" icon="el-icon-document-copy" type="text" @click="copy">
           复制代码
-        </el-button>
+        </el-button> -->
         <el-button class="delete-btn" icon="el-icon-delete" type="text" @click="empty">
           清空
         </el-button>
+        <el-button icon="el-icon-view" type="text" @click="showJson">
+          查看json
+        </el-button>
       </div>
-      <el-scrollbar class="center-scrollbar">
-        <el-row class="center-board-row" :gutter="formConf.gutter">
-          <el-form
-            :size="formConf.size"
-            :label-position="formConf.labelPosition"
-            :disabled="formConf.disabled"
-            :label-width="formConf.labelWidth + 'px'"
-          >
-            <draggable class="drawing-board" :list="drawingList" :animation="340" group="componentsGroup">
-              <draggable-item
-                v-for="(item, index) in drawingList"
-                :key="item.renderKey"
-                :drawing-list="drawingList"
-                :current-item="item"
-                :index="index"
-                :active-id="activeId"
-                :form-conf="formConf"
-                @activeItem="activeFormItem"
-                @copyItem="drawingItemCopy"
-                @deleteItem="drawingItemDelete"
-              />
-            </draggable>
-            <div v-show="!drawingList.length" class="empty-info">
-              从左侧拖入或点选组件进行表单设计
-            </div>
-          </el-form>
-        </el-row>
-      </el-scrollbar>
+    
+      <div class="phone">
+        <el-scrollbar class="center-scrollbar">
+          <el-row class="center-board-row" :gutter="formConf.gutter">
+              <el-form
+              :size="formConf.size"
+              :label-position="formConf.labelPosition"
+              :disabled="formConf.disabled"
+              :label-width="formConf.labelWidth + 'px'"
+            >
+                <div v-if='formConf.descHtml' v-html='formConf.descHtml' class="desc-html">
+                </div>
+                <draggable class="drawing-board" :list="drawingList" :animation="340" group="componentsGroup">
+                  <draggable-item
+                    v-for="(item, index) in drawingList"
+                    :key="item.renderKey"
+                    :drawing-list="drawingList"
+                    :current-item="item"
+                    :index="index"
+                    :active-id="activeId"
+                    :form-conf="formConf"
+                    @activeItem="activeFormItem"
+                    @copyItem="drawingItemCopy"
+                    @deleteItem="drawingItemDelete"
+                  />
+                </draggable>
+                <div v-show="!drawingList.length" class="empty-info">
+                  从左侧拖入或点选组件进行表单设计
+                </div>
+                <template v-if='formConf.showDescPop&&formConf.descPopSetting'>
+                    <div @click='showDescPop=true' class="desc-btn" v-if='!showDescPop'>
+                        <i class="fa fa-info-circle" aria-hidden="true" ></i>
+                        <span>{{formConf.descPopSetting.popBtnTitle?formConf.descPopSetting.popBtnTitle:'注意事项'}}</span>
+                    </div>
+                    <Popup :setting="formConf.descPopSetting" v-model='showDescPop'/>
+                </template>
+            </el-form>
+          </el-row>
+        </el-scrollbar>
+       
+      </div>
     </div>
 
     <right-panel
@@ -130,7 +148,7 @@ import FormDrawer from './FormDrawer'
 import JsonDrawer from './JsonDrawer'
 import RightPanel from './RightPanel'
 import {
-  inputComponents, selectComponents, layoutComponents, formConf
+  inputComponents, selectComponents, layoutComponents,otherComponents, detailComponents,formConf
 } from '@/components/generator/config'
 import {
   exportDefault, beautifierConf, isNumberStr, titleCase, deepClone
@@ -148,6 +166,7 @@ import {
   getDrawingList, saveDrawingList, getIdGlobal, saveIdGlobal, getFormConf
 } from '@/utils/db'
 import loadBeautifier from '@/utils/loadBeautifier'
+import Popup from '@/components/popup'
 
 let beautifier
 const emptyActiveData = { style: {}, autosize: {} }
@@ -165,16 +184,20 @@ export default {
     JsonDrawer,
     RightPanel,
     CodeTypeDialog,
-    DraggableItem
+    DraggableItem,
+    Popup
   },
   data() {
     return {
+      showDescPop:false,
       logo,
       idGlobal,
       formConf,
       inputComponents,
       selectComponents,
       layoutComponents,
+      otherComponents,
+      detailComponents,
       labelWidth: 100,
       drawingList: drawingDefalut,
       drawingData: {},
@@ -197,9 +220,18 @@ export default {
           title: '选择型组件',
           list: selectComponents
         },
+        // {
+        //   title: '布局型组件',
+        //   list: layoutComponents
+        // }
+        // ,
         {
-          title: '布局型组件',
-          list: layoutComponents
+          title: '其他组件',
+          list: otherComponents
+        },
+        {
+          title:'明细组件',
+          list:detailComponents,
         }
       ]
     }
@@ -242,7 +274,7 @@ export default {
     if (Array.isArray(drawingListInDB) && drawingListInDB.length > 0) {
       this.drawingList = drawingListInDB
     } else {
-      this.drawingList = drawingDefalut
+     // this.drawingList = drawingDefalut
     }
     this.activeFormItem(this.drawingList[0])
     if (formConfInDB) {
@@ -279,15 +311,25 @@ export default {
     },
     addComponent(item) {
       const clone = this.cloneComponent(item)
-      this.drawingList.push(clone)
-      this.activeFormItem(clone)
+      console.log(3333333,clone,this.drawingList)
+      //选择明细，点击直接往明细里添加组件，且不重新选中
+      if(this.drawingList.length&&this.activeData.layout=='rowFormItem'&&clone.layout!=='rowFormItem'){
+        if(!Array.isArray(this.activeData.__config__.params)){
+          this.activeData.__config__.params=[]
+        }
+        this.activeData.__config__.params.push(clone)
+      }
+      else{
+        this.drawingList.push(clone)
+        this.activeFormItem(clone)
+      }
     },
     cloneComponent(origin) {
       const clone = deepClone(origin)
       const config = clone.__config__
       config.span = this.formConf.span // 生成代码时，会根据span做精简判断
       this.createIdAndKey(clone)
-      clone.placeholder !== undefined && (clone.placeholder += config.label)
+      clone.placeholder !== undefined && (clone.placeholder)
       tempActiveData = clone
       return tempActiveData
     },
@@ -299,17 +341,34 @@ export default {
         item.__vModel__ = `field${this.idGlobal}`
       } else if (config.layout === 'rowFormItem') {
         config.componentName = `row${this.idGlobal}`
-        !Array.isArray(config.children) && (config.children = [])
+        !Array.isArray(config.params) && (config.params = [])
         delete config.label // rowFormItem无需配置label属性
       }
-      if (Array.isArray(config.children)) {
-        config.children = config.children.map(childItem => this.createIdAndKey(childItem))
+      if (Array.isArray(config.params)) {
+        config.params = config.params.map(childItem => this.createIdAndKey(childItem))
       }
       return item
     },
     AssembleFormData() {
+      let draList = this.drawingList.map(it=>it.__config__)
+      let resultList = deepClone(draList)
+      resultList.forEach(it=>{
+        delete it.formId
+        delete it.renderKey
+        delete it.componentName
+        if(it.type=='detail'){
+          if(!it.params)it.params=[]
+          it.params = it.params.map(it=>it.__config__)
+          it.params.forEach(item=>{
+            delete item.formId
+            delete item.renderKey
+            delete it.componentName
+          })
+        }
+      }) 
+      console.log(3333,resultList)     
       this.formData = {
-        fields: deepClone(this.drawingList),
+        params: resultList,
         ...this.formConf
       }
     },
@@ -387,7 +446,7 @@ export default {
       config.formId = this.activeId
       config.span = this.activeData.__config__.span
       this.activeData.__config__.tag = config.tag
-      this.activeData.__config__.tagIcon = config.tagIcon
+      this.activeData.__config__.type = config.type
       this.activeData.__config__.document = config.document
       if (typeof this.activeData.__config__.defaultValue === typeof config.defaultValue) {
         config.defaultValue = this.activeData.__config__.defaultValue
@@ -406,13 +465,13 @@ export default {
         list.splice(index, 1, newTag)
       } else {
         list.forEach(item => {
-          if (Array.isArray(item.__config__.children)) this.updateDrawingList(newTag, item.__config__.children)
+          if (Array.isArray(item.__config__.params)) this.updateDrawingList(newTag, item.__config__.params)
         })
       }
     },
     refreshJson(data) {
-      this.drawingList = deepClone(data.fields)
-      delete data.fields
+      this.drawingList = deepClone(data.params)
+      delete data.params
       this.formConf = data
     }
   }
@@ -421,4 +480,42 @@ export default {
 
 <style lang='scss'>
 @import '@/styles/home';
+</style>
+<style scoped lang='scss'>
+.phone{
+    margin: 20px 20px 0;
+    background-image: url('../../assets/phone.png');
+    background-repeat: no-repeat;
+    background-size: 100%;
+    height: 100%;
+    padding: 100px 16px;
+    box-sizing: border-box;
+    width: 375px;
+    margin: auto;
+    position:relative;
+    .el-form{
+      // https://segmentfault.com/q/1010000010677322
+      //让所有position:fixed元素相对父元素定位
+      transform:translate(0,0);
+      padding-top:10px;
+    }
+    .desc-html{
+      border-bottom:1px solid #d9d9d9;
+    }
+    .desc-btn{
+        position:fixed;
+        bottom:100px;
+        right:5px;  
+        background-color:#CFD6DF;
+        color:#fff;
+        border-radius:5px;
+        font-size:12px;
+        width:10px;
+        padding:10px;
+        line-height:1.2
+        i{
+            font-size:16px;
+        }
+    }
+}
 </style>

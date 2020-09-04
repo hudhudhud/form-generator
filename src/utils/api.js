@@ -1,0 +1,1 @@
+export const GET_DEPT = process.env.VUE_APP_PUB_URL + '/yq/dept/info' //获取一级部门列表
