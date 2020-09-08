@@ -9,8 +9,8 @@ export function getDrawingList() {
   // 加入缓存版本的概念，保证缓存数据与程序匹配
   const version = localStorage.getItem(DRAWING_ITEMS_VERSION_KEY)
   if (version !== DRAWING_ITEMS_VERSION) {
-    localStorage.setItem(DRAWING_ITEMS_VERSION_KEY, DRAWING_ITEMS_VERSION)
-    saveDrawingList([])
+    // localStorage.setItem(DRAWING_ITEMS_VERSION_KEY, DRAWING_ITEMS_VERSION)
+    //saveDrawingList([])
     return null
   }
 

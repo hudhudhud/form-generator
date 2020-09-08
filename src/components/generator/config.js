@@ -16,14 +16,23 @@ export const formConf = {
   beforeSubmit:'', //字符串函数名称或函数，提交前执行
   descHtml:"", //放在表单顶部的说明文字
   showDescPop:false, //是否显示说明弹窗，为true则进入页面时自动弹出
-  descPopSetting:{ //showDescPop为true是，弹窗的设置信息
-      popBtnTitle:"说明",//关闭弹窗时，显示在界面上按钮的文字，默认为"注意事项"
-      title:"test", //弹窗标题
-      popHeight:"400",//弹窗高度，默认400
-      //弹窗内容，支持html文本
-      content:"<p style='color:red;height:50px'>我是说明</p>"
-  },
+  // descPopSetting:{ //showDescPop为true是，弹窗的设置信息
+  //     popBtnTitle:"",//关闭弹窗时，显示在界面上按钮的文字，默认为"注意事项"
+  //     title:"", //弹窗标题
+  //     popHeight:"",//弹窗高度，默认400
+  //     //弹窗内容，支持html文本
+  //     content:""
+  // },
   onlySaveValue:false,
+  // customerBtns:[ //自定义按钮数组
+  //     // {
+  //     //     "title":"测试", //按钮标题
+  //     //     "type":"cancel", //按钮类型，点击按钮时提交的操作类型
+  //     //     "showState":["add","edit"],//显示场景：add 新增，edit 修改
+  //     //     "needValid":false,//表单是否需要校验，默认为false
+  //     //     "style":"background-color:green;color:#fff" //自定义按钮样式
+  //     // }        
+  // ]
 }
 
 // 输入型组件 【左面板】
@@ -40,16 +49,30 @@ export const inputComponents = [
       "readonly":false,//是否只读,默认false
       "show":true,//是否显示，默认为true
       "callback":"",
+    },
+  },
+  {
+    // 组件的自定义配置
+    __config__: {
+      "type":"input",  //必填，组件类型
+      "key":"",     //必填，字段名称；且为input元素上data-key属性值，获取值方法$("input[data-key='name']").val()
+      "label":"数字输入框",  //label
+      "value":"",  //默认值
+      "require":false,  //是否必填
+      "disableClear":false,//是否禁用清除按钮，默认false
+      "readonly":false,//是否只读,默认false
+      "show":true,//是否显示，默认为true
+      "callback":"",
       "rules":[ //正则规则
           {
               "regexp":"^[0-9]*$",
-              "message":"年龄请输入整数"
+              "message":"请输入数字"
           }
       ],
       "attributes": [  //作用于input的属性
           {
               "name": "placeholder",
-              "value": "请输入"
+              "value": "请输入数字"
           }
       ],
     },
@@ -77,7 +100,7 @@ export const selectComponents = [
       "type":"dateTimePicker",//必填，组件类型
       "key":"",//必填，字段名称；且为input元素上data-key属性值，获取值方法$("input[data-key='time']").val()
       "label":"时间日期选择" ,
-      "pickerType":"time",// 选择类型 'date','datetime', 'time' 
+      "pickerType":"date",// 选择类型 'date','datetime', 'time' 
       "require":true,
       "show":true,//是否显示，默认为true
       "value":"", //默认值
@@ -150,13 +173,7 @@ export const selectComponents = [
       //默认值,值类型，或者对象类型(显示值与保存值不一样时)，如下，原showValue属性已去掉 
       "value":1,
       // "value":{"value":1,"showValue":"one"},//默认值，包含两个属性，一个值，一个显示在界面上的值
-      //以下配置项同input，作用于input
-      "attributes": [
-        {
-            "name": "placeholder",
-            "value": "请选择"
-        }
-      ],
+      //以下配置项同input，作用于input,
       "callback":""
     },
     optionsType:'value',

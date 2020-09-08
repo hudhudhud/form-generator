@@ -5,7 +5,7 @@
     </div>
     <div class="cell-value">
         <template>
-            <input type="text" v-model='inputValue' @click="openPicker" v-bind="attrs"  readonly :data-key='item.key' @focus="focus" ref="formInput">
+            <input type="text" v-model='inputValue' @click="openPicker" v-bind="{...localAttr,...attrs}"  readonly :data-key='item.key' @focus="focus" ref="formInput">
             <div class="mint-field-clear" style="" v-if='!item.disableClear&&inputValue' @click='inputValue=""'>
                 <i class="mintui mintui-field-error"></i>
             </div>
@@ -111,6 +111,12 @@ export default {
             },
             immediate:true,
         },
+        "item.label":{
+            handler(val){
+                this.localAttr={placeholder:val?'请输入'+val:''}
+            },
+            immediate:true,
+        },
     },
     data(){
         return {
@@ -122,7 +128,8 @@ export default {
             errorInfo:'',
             currentTime:'00:00',
             currentDate:(new Date),
-            attrs:[]
+            attrs:[],
+            localAttr:[]
         }
     },
     mounted(){

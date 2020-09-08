@@ -5,7 +5,7 @@
     </div>
     <div class="cell-value">
         <template>
-            <input type="text" v-model='showValue' @click="popupVisible=true" v-bind="$attrs" readonly :data-key='item.key' @focus="focus" ref="formInput">
+            <input type="text" v-model='showValue' @click="showPop" v-bind="{...localAttr,...attrs}" readonly :data-key='item.key' @focus="focus" ref="formInput">
             <div class="mint-field-clear" style="" v-if='!item.disableClear&&showValue' @click='showValue=""'>
                 <i class="mintui mintui-field-error"></i>
             </div>
@@ -104,6 +104,25 @@ export default {
             },
             deep:true
         },
+         "item.attributes":{
+            handler(attributes){
+                this.attrs={}
+                if(Array.isArray(attributes)){
+                    attributes.forEach(at=>{
+                        if(at.name){
+                            this.attrs[at.name]=at.value
+                        }
+                    })
+                }
+            },
+            immediate:true,
+        },
+         "item.label":{
+            handler(val){
+                this.localAttr={placeholder:val?'请输入'+val:''}
+            },
+            immediate:true,
+        },
     },
     data(){
         return {
@@ -117,6 +136,8 @@ export default {
             valueKey:undefined,
             firstLoad:true,
             timeoutId:'',
+            attrs:[],
+            localAttr:[]
         }
     },
     computed: {
@@ -136,6 +157,14 @@ export default {
         
     },
     methods: {
+        showPop(){
+            if(typeof this.item.options == 'string'){
+                return
+            }
+            if(Array.isArray(this.item.options)){
+                this.popupVisible=true
+            }
+        },
         openPicker() {
             this.$refs.picker.open();
         },

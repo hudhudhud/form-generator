@@ -5,7 +5,7 @@
         </div>
         <div class="cell-value">
             <template>
-                <input type="text" v-model='showValue' @click="popupVisible=true" v-bind="attrs" readonly v-on="listeners" :data-key='item.key' @focus="focus" ref="formInput">
+                <input type="text" v-model='showValue' @click="showPop" v-bind="{...localAttr,...attrs}" readonly v-on="listeners" :data-key='item.key' @focus="focus" ref="formInput">
                 <div class="mint-field-clear" style="" v-if='!item.disableClear&&showValue' @click='showValue=""'>
                     <i class="mintui mintui-field-error"></i>
                 </div>
@@ -201,6 +201,12 @@ export default {
             },
             immediate:true,
         },
+        "item.label":{
+            handler(val){
+                this.localAttr={placeholder:val?'请输入'+val:''}
+            },
+            immediate:true,
+        },
     },
     data(){
         return {
@@ -223,7 +229,8 @@ export default {
             pageSize:this.item.pageSize?this.item.pageSize:20,
             func:"",
             searchFunc:"",
-            attrs:[]
+            attrs:[],
+            localAttr:[]
             
         }
     },
@@ -262,6 +269,14 @@ export default {
                         }
                     }
                 }
+            }
+        },
+        showPop(){
+            if(typeof this.item.options == 'string'){
+                return
+            }
+            if(Array.isArray(this.item.options)){
+                this.popupVisible=true
             }
         },
         // 防抖
@@ -433,7 +448,7 @@ export default {
     box-sizing: border-box;
     position:relative;
     .list{
-        overflow: scroll;
+        overflow-x: hidden;
         margin-top:10px;
         height: calc(100% - 130px);
         &.chooseMutiple{

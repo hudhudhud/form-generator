@@ -4,7 +4,7 @@
         <span class="cell-text">{{item.label}}</span>
     </div>
     <div class="cell-value">
-        <textarea  ref='input'  rows="1" class="mint-field-core" v-bind="attrs" v-on="listeners" v-model='txt' 
+        <textarea  ref='input'  rows="1" class="mint-field-core" v-bind="{...localAttr,...attrs}" v-on="listeners" v-model='txt' 
         :readonly='item.readonly' :data-key='item.key'></textarea>
     </div>
     <p class="error-info">{{errorInfo}}</p>
@@ -30,6 +30,12 @@ export default {
         "item.value":{
             handler(val){
                 this.txt=val
+            },
+            immediate:true,
+        },
+        "item.label":{
+            handler(val){
+                this.localAttr={placeholder:val?'请输入'+val:''}
             },
             immediate:true,
         },
@@ -103,7 +109,8 @@ export default {
             autoSize:this.item.autoSize?this.item.autoSize:false,
             errorInfo:'',
             onlyShowIn:false,
-            attrs:[]
+            attrs:[],
+            localAttr:{}
         }
     },
     methods:{

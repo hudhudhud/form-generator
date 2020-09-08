@@ -5,9 +5,9 @@
       <div class="logo-wrapper">
         <div class="logo">
           <img :src="logo" alt="logo"> Form Generator
-          <a class="github" href="https://github.com/JakHuang/form-generator" target="_blank">
+          <!-- <a class="github" href="https://github.com/JakHuang/form-generator" target="_blank">
             <img src="https://github.githubassets.com/pinned-octocat.svg" alt>
-          </a>
+          </a> -->
         </div>
       </div>
       <el-scrollbar class="left-scrollbar">
@@ -62,6 +62,9 @@
         <el-button class="delete-btn" icon="el-icon-delete" type="text" @click="empty">
           清空
         </el-button>
+        <el-button icon="el-icon-download" type="text" @click="confirmJson">
+          保存
+        </el-button>
         <el-button icon="el-icon-view" type="text" @click="showJson">
           查看json
         </el-button>
@@ -75,8 +78,9 @@
               :label-position="formConf.labelPosition"
               :disabled="formConf.disabled"
               :label-width="formConf.labelWidth + 'px'"
-            >
-                <div v-if='formConf.descHtml' v-html='formConf.descHtml' class="desc-html">
+            > 
+              <div class="form-container"  :class="{'show':Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length,}">
+                 <div v-if='formConf.descHtml' v-html='formConf.descHtml' class="desc-html">
                 </div>
                 <draggable class="drawing-board" :list="drawingList" :animation="340" group="componentsGroup">
                   <draggable-item
@@ -87,9 +91,10 @@
                     :index="index"
                     :active-id="activeId"
                     :form-conf="formConf"
-                    @activeItem="activeFormItem"
+                    @activeItem="activeFormItem($event,index)"
                     @copyItem="drawingItemCopy"
                     @deleteItem="drawingItemDelete"
+                    :class="{actived:activeId == index}"
                   />
                 </draggable>
                 <div v-show="!drawingList.length" class="empty-info">
@@ -102,6 +107,16 @@
                     </div>
                     <Popup :setting="formConf.descPopSetting" v-model='showDescPop'/>
                 </template>
+                <div class="btns"  
+                v-if='Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length'
+                :class="{'no-space':Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length>2}">
+                  <el-button type="primary">提交</el-button>
+                  <template v-for='(btn,i) of formConf.customerBtns' >
+                      <el-button type="primary" plain  :style='btn.style' :key='i'>{{btn.title}} </el-button> 
+                  </template>
+                  <el-button type="default">返回</el-button>
+              </div> 
+              </div>
             </el-form>
           </el-row>
         </el-scrollbar>
@@ -148,7 +163,7 @@ import FormDrawer from './FormDrawer'
 import JsonDrawer from './JsonDrawer'
 import RightPanel from './RightPanel'
 import {
-  inputComponents, selectComponents, layoutComponents,otherComponents, detailComponents,formConf
+  inputComponents, selectComponents,otherComponents, detailComponents,formConf
 } from '@/components/generator/config'
 import {
   exportDefault, beautifierConf, isNumberStr, titleCase, deepClone
@@ -159,6 +174,7 @@ import {
 import { makeUpJs } from '@/components/generator/js'
 import { makeUpCss } from '@/components/generator/css'
 import drawingDefalut from '@/components/generator/drawingDefalut'
+import initDrawing from '@/components/generator/initDrawing'
 import logo from '@/assets/logo.png'
 import CodeTypeDialog from './CodeTypeDialog'
 import DraggableItem from './DraggableItem'
@@ -167,7 +183,7 @@ import {
 } from '@/utils/db'
 import loadBeautifier from '@/utils/loadBeautifier'
 import Popup from '@/components/popup'
-
+import {GET_JSON} from '@/utils/api'
 let beautifier
 const emptyActiveData = { style: {}, autosize: {} }
 let oldActiveId
@@ -195,20 +211,19 @@ export default {
       formConf,
       inputComponents,
       selectComponents,
-      layoutComponents,
       otherComponents,
       detailComponents,
       labelWidth: 100,
-      drawingList: drawingDefalut,
+      drawingList: [],//drawingDefalut,
       drawingData: {},
-      activeId: drawingDefalut[0].formId,
+      activeId: '',//drawingDefalut[0].formId,
       drawerVisible: false,
       formData: {},
       dialogVisible: false,
       jsonDrawerVisible: false,
       generateConf: null,
       showFileName: false,
-      activeData: drawingDefalut[0],
+      activeData: {},//drawingDefalut[0],
       saveDrawingListDebounce: debounce(340, saveDrawingList),
       saveIdGlobalDebounce: debounce(340, saveIdGlobal),
       leftComponents: [
@@ -258,14 +273,14 @@ export default {
     },
     drawingList: {
       handler(val) {
-        this.saveDrawingListDebounce(val)
+        //this.saveDrawingListDebounce(val)
         if (val.length === 0) this.idGlobal = 100
       },
       deep: true
     },
     idGlobal: {
       handler(val) {
-        this.saveIdGlobalDebounce(val)
+       // this.saveIdGlobalDebounce(val)
       },
       immediate: true
     }
@@ -274,11 +289,55 @@ export default {
     if (Array.isArray(drawingListInDB) && drawingListInDB.length > 0) {
       this.drawingList = drawingListInDB
     } else {
-     // this.drawingList = drawingDefalut
+      //回写json
+      if(initDrawing&&Array.isArray(initDrawing['params'])){
+        initDrawing['params'].forEach((param,i)=>{
+          
+          if(param.type!=='detail'){
+             //非明细
+            let res = this.settingInitJson(param)
+            this.drawingList.push(res)
+          }
+          else{
+            //明细
+            let obj = {}
+            Object.keys(param).forEach(key=>{
+              if(key!=='params'){
+                obj[key]=param[key]
+              }
+              else{
+                obj[key] = param[key].map(item=>{
+                  return this.settingInitJson(item)
+                  // {
+                  //   __config__:deepClone(item)
+                  // }
+                })
+              }
+            })
+            this.drawingList.push({__config__:{...obj},layout:'rowFormItem'})
+          }
+        })
+      }
+      else{
+        this.drawingList = drawingDefalut
+      }
     }
+  
+
     this.activeFormItem(this.drawingList[0])
+    this.activeId=0
+
     if (formConfInDB) {
       this.formConf = formConfInDB
+    }
+    else {
+      if(initDrawing){
+        Object.keys(initDrawing).forEach((key,i)=>{
+          if(key!=='params'){
+            this.$set(this.formConf,key,initDrawing[key])
+          }
+        })
+      }
     }
     loadBeautifier(btf => {
       beautifier = btf
@@ -299,9 +358,61 @@ export default {
     })
   },
   methods: {
-    activeFormItem(currentItem) {
+    settingInitJson(param){
+      let obj = {}
+      if(param.show===undefined){
+        param.show=true
+      }
+      if(param.type=='textarea'){
+        if(param.autoSize){
+          if(typeof param.autoSize==='boolean'){
+            obj.settingAutoSize=false
+          }
+          else if(param.autoSize==='object'){
+              obj.settingAutoSize=true
+          }
+        }
+        else{
+          obj.settingAutoSize=false
+        }
+      }
+      if(param.labelKey&&param.valueKey){
+        obj.optionsType='object'
+      }
+      else{
+         obj.optionsType='value'
+      }
+      if(typeof param.options == 'string'){
+        obj.jsGetOptions=true
+      }
+      else{
+        obj.jsGetOptions=false
+      }
+      if(param.value){
+        if(typeof param.value =='object'){
+          obj.defaultValueType='object'
+        }
+        else{
+          obj.defaultValueType='value'
+        }
+      }
+      if(Array.isArray(param.attributes)){
+        param.attributes.forEach((it,i)=>{
+          if(typeof it.value=='object'){
+            if(Array.isArray(it.value)){
+              it.value = it.value.join(' ')
+            }
+            else {
+              it.value = Object.keys(it.value).map(key=>{return `${key}:${it.value[key]}`}).join(';')
+            }
+          }
+        })
+      }
+      return {__config__:{...param},...obj}
+    },
+    activeFormItem(currentItem,index) {
       this.activeData = currentItem
-      this.activeId = currentItem.__config__.formId
+      this.activeId = index//currentItem.__config__.formId
     },
     onEnd(obj) {
       if (obj.from !== obj.to) {
@@ -311,7 +422,6 @@ export default {
     },
     addComponent(item) {
       const clone = this.cloneComponent(item)
-      console.log(3333333,clone,this.drawingList)
       //选择明细，点击直接往明细里添加组件，且不重新选中
       if(this.drawingList.length&&this.activeData.layout=='rowFormItem'&&clone.layout!=='rowFormItem'){
         if(!Array.isArray(this.activeData.__config__.params)){
@@ -393,6 +503,7 @@ export default {
       this.$confirm('确定要清空所有组件吗？', '提示', { type: 'warning' }).then(
         () => {
           this.drawingList = []
+          this.formConf={}
           this.idGlobal = 100
         }
       )
@@ -423,6 +534,13 @@ export default {
     showJson() {
       this.AssembleFormData()
       this.jsonDrawerVisible = true
+    },
+    confirmJson(){
+      this.AssembleFormData()
+      let jsonString = JSON.stringify(this.formData)
+      let beautifierJson = beautifier.js(jsonString, beautifierConf.js)
+      console.log(33333,beautifierJson)
+      window.parent.parentSetJson(beautifierJson); 
     },
     download() {
       this.dialogVisible = true
@@ -495,9 +613,26 @@ export default {
     position:relative;
     .el-form{
       // https://segmentfault.com/q/1010000010677322
-      //让所有position:fixed元素相对父元素定位
+      //让所有position:fixed元素相对父元素定位，translate之后，fix相对窗口定位失效，相对父元素
       transform:translate(0,0);
-      padding-top:10px;
+      width:100%;
+      box-sizing: border-box;
+      overflow: hidden;
+       //position:fixed元素滚动时需要固定位置，因此增加相对定位容器
+      .form-container{
+        padding-top:10px;
+        position:relative;
+        width:100%;
+        height:100%;
+        overflow: auto;
+        box-sizing: border-box;
+         &.show{
+          padding-bottom:60px;
+        }
+      }
+      .actived{
+        border:1px solid red;
+      }
     }
     .desc-html{
       border-bottom:1px solid #d9d9d9;
@@ -516,6 +651,24 @@ export default {
         i{
             font-size:16px;
         }
+    }
+    .btns{
+        width:100%;
+        position:fixed;
+        bottom:0;
+        height:50px;
+        box-shadow: 0 -5px 10px rgba(0,0,0,0.1);
+        display:flex;
+        justify-content: space-around;
+        align-items: center;
+        background-color:#fff;
+        flex-wrap:nowrap;
+        overflow-x:scroll;
+        box-sizing:border-box;
+        &.no-space{
+            justify-content: unset;
+        }
+        
     }
 }
 </style>

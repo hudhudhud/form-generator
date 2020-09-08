@@ -12,7 +12,7 @@ Vue.component('tinymce', Tinymce)
 
 // console.log(222,axios)
 for(let name in FormComponents){
-  console.log(name,FormComponents[name])
+  // console.log(name,FormComponents[name])
   Vue.component(name,FormComponents[name])
 }
 

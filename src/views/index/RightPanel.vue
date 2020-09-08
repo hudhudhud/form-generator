@@ -1,10 +1,10 @@
 <template>
-  <div class="right-board">
+  <div class="right-board" >
     <el-tabs v-model="currentTab" class="center-tabs">
       <el-tab-pane label="组件属性" name="field" />
       <el-tab-pane label="表单属性" name="form" />
     </el-tabs>
-    <div class="field-box">
+    <div class="field-box" v-if='activeData&&activeData.__config__'>
       <el-scrollbar class="right-scrollbar">
         <!-- 组件属性 -->
         <el-form v-show="currentTab==='field' && showField &&activeData.__config__.type!='detail'" size="small" label-width="120px">
@@ -170,7 +170,7 @@
             </el-form-item>
           </template>
           <!-- input正则 -->
-          <section v-if="Array.isArray(activeData.__config__.rules)&&activeData.__config__.type=='input'">
+          <section v-if="activeData.__config__.type=='input'">
             <el-divider>正则校验</el-divider>
             <div v-for="(item, index) in activeData.__config__.rules"
               :key="index"
@@ -533,53 +533,6 @@
             <el-divider />
           </template>
 
-          <template v-if="['el-cascader'].indexOf(activeData.__config__.tag) > -1">
-            <el-divider>选项</el-divider>
-            <el-form-item label="数据类型">
-              <el-radio-group v-model="activeData.__config__.dataType" size="small">
-                <el-radio-button label="dynamic">
-                  动态数据
-                </el-radio-button>
-                <el-radio-button label="static">
-                  静态数据
-                </el-radio-button>
-              </el-radio-group>
-            </el-form-item>
-
-            <template v-if="activeData.__config__.dataType === 'dynamic'">
-              <el-form-item label="标签键名">
-                <el-input v-model="activeData.props.props.label" placeholder="请输入标签键名" />
-              </el-form-item>
-              <el-form-item label="值键名">
-                <el-input v-model="activeData.props.props.value" placeholder="请输入值键名" />
-              </el-form-item>
-              <el-form-item label="子级键名">
-                <el-input v-model="activeData.props.props.children" placeholder="请输入子级键名" />
-              </el-form-item>
-            </template>
-
-            <!-- 级联选择静态树 -->
-            <el-tree
-              v-if="activeData.__config__.dataType === 'static'"
-              draggable
-              :data="activeData.options"
-              node-key="id"
-              :expand-on-click-node="false"
-              :render-content="renderContent"
-            />
-            <div v-if="activeData.__config__.dataType === 'static'" style="margin-left: 20px">
-              <el-button
-                style="padding-bottom: 0"
-                icon="el-icon-circle-plus-outline"
-                type="text"
-                @click="addTreeItem"
-              >
-                添加父级
-              </el-button>
-            </div>
-            <el-divider />
-          </template>
-
           <el-form-item v-if="activeData.__config__.optionType !== undefined" label="选项样式">
             <el-radio-group v-model="activeData.__config__.optionType">
               <el-radio-button label="default">
@@ -590,27 +543,7 @@
               </el-radio-button>
             </el-radio-group>
           </el-form-item>
-         
-
-          <el-form-item v-if="activeData.range !== undefined" label="范围选择">
-            <el-switch v-model="activeData.range" @change="rangeChange" />
-          </el-form-item>
-
-     
-          <el-form-item v-if="activeData.__config__.tag === 'el-cascader'" label="是否多选">
-            <el-switch v-model="activeData.props.props.multiple" />
-          </el-form-item>
-          <el-form-item v-if="activeData.__config__.tag === 'el-cascader'" label="展示全路径">
-            <el-switch v-model="activeData['show-all-levels']" />
-          </el-form-item>
-          <el-form-item v-if="activeData.__config__.tag === 'el-cascader'" label="可否筛选">
-            <el-switch v-model="activeData.filterable" />
-          </el-form-item>
-          
-          <!-- <el-form-item v-if="activeData.__config__.tag === 'el-upload'" label="多选文件">
-            <el-switch v-model="activeData.multiple" />
-          </el-form-item>-->
-          <section v-if="Array.isArray(activeData.__config__.attributes)">
+          <section>
             <el-divider>input属性</el-divider>
             <div
               v-for="(item, index) in activeData.__config__.attributes"
@@ -621,7 +554,13 @@
                 <i class="el-icon-close" />
               </span>
               <el-form-item label="属性名称">
-                <el-input v-model="item.name" placeholder="请输入属性名称" />
+                <!-- <el-input v-model="item.name" placeholder="请输入属性名称" /> -->
+                <el-select v-model="item.name" placeholder="请选择">
+                  <el-option  key="placeholder" label="placeholder" value="placeholder"> </el-option>
+                  <el-option  key="style" label="style（作用于最外层）" value="style"> </el-option>
+                  <el-option  key="class" label="class（作用于最外层）" value="class"> </el-option>
+                  <el-option  key="id" label="id" value="id"> </el-option>
+                </el-select>
               </el-form-item>
               <el-form-item label="属性值" style="margin-bottom:0">
                 <el-input v-model="item.value" placeholder="请输入属性值" />
@@ -668,6 +607,41 @@
           <el-form-item label="表单只提交value值">
             <el-switch v-model="formConf.onlySaveValue" />
           </el-form-item>
+          <section>
+            <el-divider>自定义按钮</el-divider>
+            <div
+              v-for="(item, index) in formConf.customerBtns"
+              :key="index"
+              class="reg-item"
+            >
+              <span class="close-btn" @click="formConf.customerBtns.splice(index, 1)">
+                <i class="el-icon-close" />
+              </span>
+              <el-form-item label="按钮名称">
+                <el-input v-model="item.title" placeholder="请输入属性名称" />
+              </el-form-item>
+              <el-form-item label="按钮值" style="margin-bottom:0">
+                <el-input v-model="item.type" placeholder="请输入属性值" />
+              </el-form-item>
+              <el-form-item label="按钮显示场景">
+                <el-checkbox-group v-model="item.showState">
+                  <el-checkbox label="add" value=''>新增时</el-checkbox>
+                  <el-checkbox label="edit" value=''>回写时</el-checkbox>
+                </el-checkbox-group>
+              </el-form-item>
+              <el-form-item label="表单提交时是否需要校验">
+                <el-switch v-model="item.needValid" />
+              </el-form-item>
+              <el-form-item label="按钮样式style">
+                <el-input type='textarea' :row='4' v-model="item.style" placeholder="请输入按钮样式" />
+              </el-form-item> 
+            </div>
+            <div style="margin-left: 20px">
+              <el-button icon="el-icon-circle-plus-outline" type="text" @click="addCustomerBtn">
+                添加自定义按钮
+              </el-button>
+            </div>
+          </section>
           <!-- <el-form-item label="表单尺寸">
             <el-radio-group v-model="formConf.size">
               <el-radio-button label="medium">
@@ -708,7 +682,7 @@
           </el-form-item> -->
         </el-form>
         <!-- 明细表单属性 -->
-        <el-form v-show="activeData.__config__.type=='detail'" size="small" label-width="90px">
+        <el-form v-show="currentTab==='field' && showField && activeData.__config__.type=='detail'" size="small" label-width="90px">
           <el-form-item  label="组件类型">
             <el-input v-model="activeData.__config__.type" readonly />
           </el-form-item>
@@ -743,7 +717,7 @@ import TreeNodeDialog from '@/views/index/TreeNodeDialog'
 import { isNumberStr } from '@/utils/index'
 import IconsDialog from './IconsDialog'
 import {
-  inputComponents, selectComponents, layoutComponents
+  inputComponents, selectComponents
 } from '@/components/generator/config'
 import { saveFormConf } from '@/utils/db'
 
@@ -869,18 +843,18 @@ export default {
     //     || 'https://element.eleme.cn/#/zh-CN/component/installation'
     //   )
     // },
-    dateOptions() {
-      if (
-        this.activeData.type !== undefined
-        && this.activeData.__config__.tag === 'el-date-picker'
-      ) {
-        if (this.activeData['start-placeholder'] === undefined) {
-          return this.dateTypeOptions
-        }
-        return this.dateRangeTypeOptions
-      }
-      return []
-    },
+    // dateOptions() {
+    //   if (
+    //     this.activeData.type !== undefined
+    //     && this.activeData.__config__.tag === 'el-date-picker'
+    //   ) {
+    //     if (this.activeData['start-placeholder'] === undefined) {
+    //       return this.dateTypeOptions
+    //     }
+    //     return this.dateRangeTypeOptions
+    //   }
+    //   return []
+    // },
     tagList() {
       return [
         {
@@ -909,25 +883,52 @@ export default {
   watch: {
     formConf: {
       handler(val) {
-        saveFormConf(val)
+        //saveFormConf(val)
       },
       deep: true
-    }
+    },
+    // 'activeData.defaultValueType':{
+    //   handler(v){
+    //     this.defaultValueTypeChange(v)
+    //   },
+    //   // immediate:true,
+    // },
+    // 'activeData.jsGetOptions':{
+    //   handler(v){
+    //     this.jsGetOptionsChange(v)
+    //   },
+    //   // immediate:true,
+    // },
+    // 'activeData.optionsType':{
+    //   handler(v){
+    //     this.optionsTypeChange(v)
+    //   },
+    //   // immediate:true,
+    // }
   },
   methods: {
     addReg() {
+      if(!Array.isArray(this.activeData.__config__.rules)){
+        this.$set(this.activeData.__config__,'rules',[])
+      }
       this.activeData.__config__.rules.push({
         regexp: '',
         message: ''
       })
     },
     addAttr(){
+      if(!Array.isArray(this.activeData.__config__.attributes)){
+        this.$set(this.activeData.__config__,'attributes',[])
+      }
       this.activeData.__config__.attributes.push({
         name: '',
         value: ''
       })
     },
     addSelectItem() {
+      if(!Array.isArray(this.activeData.__config__.options)){
+        this.$set(this.activeData.__config__,'options',[])
+      }
       if(this.activeData.optionsType=='value'){
         this.activeData.__config__.options.push('')
       }
@@ -1081,50 +1082,50 @@ export default {
     },
     settingAutoSizeChange(val){
       if(val){
-        this.activeData.__config__.autoSize={minHeight:48,maxHeight:''}
+        this.$set(this.activeData.__config__,'autoSize',{minHeight:48,maxHeight:''})
       }
       else{
-        this.activeData.__config__.autoSize=true
+        this.$set(this.activeData.__config__,'autoSize',true)
       }
     },
     timePickerTypeChange(val){
       if(val==='date'){
-        this.activeData.__config__.formatStr='YYYY-MM-DD'
+        this.$set(this.activeData.__config__,'formatStr','YYYY-MM-DD')
       }
       else if(val=='datetime'){
-        this.activeData.__config__.formatStr='YYYY-MM-DD HH:mm'
+        this.$set(this.activeData.__config__,'formatStr','YYYY-MM-DD HH:mm')
       }
       else if(val=='time'){
-        this.activeData.__config__.formatStr='HH:mm'
+        this.$set(this.activeData.__config__,'formatStr','HH:mm')
       }
     },
     optionsTypeChange(val){
       if(this.activeData.jsGetOptions){
-        this.activeData.__config__.options=''
+        this.$set(this.activeData.__config__,'options','')
       }
       else{
-        this.activeData.__config__.options=[]
+        this.$set(this.activeData.__config__,'options',[])
       }
     },
     defaultValueTypeChange(val){
       if(val=='value'){
-        this.activeData.__config__.value=''
+        this.$set(this.activeData.__config__,'value','')
       }
       else{
-        this.activeData.__config__.value={showValue:'',value:''}
+        this.$set(this.activeData.__config__,'value',{showValue:'',value:''})
       }
     },
     jsGetOptionsChange(val){
       if(val){
-         this.activeData.__config__.options=''
+        this.$set(this.activeData.__config__,'options','')
       }
       else{
-         this.activeData.__config__.options=[]
+        this.$set(this.activeData.__config__,'options',[])
       }
     },
     addCascaderselectItem(){
       if(!Array.isArray(this.activeData.__config__.options)){
-        this.activeData.__config__.options=[]
+       this.$set(this.activeData.__config__,'options',[])
       }
       this.activeData.__config__.options.push({})
     },
@@ -1141,6 +1142,18 @@ export default {
       else{
         delete this.formConf.descPopSetting
       }
+    },
+    addCustomerBtn(){
+      if(!Array.isArray(this.formConf.customerBtns)){
+       this.$set(this.formConf,'customerBtns',[])
+      }
+      this.formConf.customerBtns.push({
+          "title":"", //按钮标题
+          "type":"", //按钮类型，点击按钮时提交的操作类型
+          "showState":[],//显示场景：add 新增，edit 修改
+          "needValid":false,//表单是否需要校验，默认为false
+          "style":"" //自定义按钮样式
+      })
     }
   }
 }

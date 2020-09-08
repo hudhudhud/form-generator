@@ -123,7 +123,6 @@ export default {
             // this.showValue = values.map(it=>it[this.labelKey]).join()
             // this.item.showValue = this.showValue
             // this.realValue = values.map(it=>it[this.valueKey]).join()
-            console.log(33333,values)
             this.realValue = values.map(it=>it.selectValue).join()
             this.showValue=values.map(it=>it.selectName).join()
         },

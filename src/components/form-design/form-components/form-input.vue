@@ -6,7 +6,7 @@
     <div class="cell-value">
         <template> 
             <!-- $attrs的class和style只作用到子组件的最外层 -->
-            <input type="text" v-model='txt' v-bind="attrs" v-on="listeners" :readonly='item.readonly' :data-key='item.key'
+            <input type="text" v-model='txt'   v-bind="{...localAttr,...attrs}" v-on="listeners" :readonly='item.readonly' :data-key='item.key'
             @focus="focus" ref="formInput">
             <div class="mint-field-clear" style="" v-if='!item.readonly&&!item.disableClear&&txt' @click='txt=""'>
                 <i class="mintui mintui-field-error"></i>
@@ -33,6 +33,12 @@ export default {
         "item.value":{
             handler(val){
                 this.txt=val
+            },
+            immediate:true,
+        },
+        "item.label":{
+            handler(val){
+                this.localAttr={placeholder:val?'请输入'+val:''}
             },
             immediate:true,
         },
@@ -94,7 +100,8 @@ export default {
             inputState:'',
             txt:this.value,
             errorInfo:'',
-            attrs:{}
+            attrs:{},
+            localAttr:{}
         }
     },
     methods:{

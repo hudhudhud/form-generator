@@ -123,7 +123,7 @@ export default {
       this.dataType = isNumberStr(val) ? 'number' : 'string'
     },
     id(val) {
-      saveTreeNodeId(val)
+      //saveTreeNodeId(val)
     }
   },
   created() {},

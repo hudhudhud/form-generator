@@ -5,7 +5,7 @@
         </div>
         <div class="cell-value">
             <template>
-                <input type="text" v-model='showValue' @click="popupVisible=true" v-bind="attrs" readonly v-on="listeners" :data-key='item.key' @focus="focus" ref="formInput">
+                <input type="text" v-model='showValue' @click="popupVisible=true" v-bind="{...localAttr,...attrs}" readonly v-on="listeners" :data-key='item.key' @focus="focus" ref="formInput">
                 <div class="mint-field-clear" style="" v-if='!item.disableClear&&showValue' @click='showValue=""'>
                     <i class="mintui mintui-field-error"></i>
                 </div>
@@ -83,6 +83,12 @@ export default {
                         }
                     })
                 }
+            },
+            immediate:true,
+        },
+         "item.label":{
+            handler(val){
+                this.localAttr={placeholder:val?'请输入'+val:''}
             },
             immediate:true,
         },
@@ -165,7 +171,8 @@ export default {
             // emptySelectObj:{"label":'请选择',"value":''},
             firstLoad:true,
             initValueAry:[],
-            attrs:[]
+            attrs:[],
+            localAttr:[]
         }
     },
     methods:{
