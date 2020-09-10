@@ -184,6 +184,8 @@ import {
 import loadBeautifier from '@/utils/loadBeautifier'
 import Popup from '@/components/popup'
 import {GET_JSON} from '@/utils/api'
+import Request from '@/utils/request'
+import {Toast} from 'mint-ui'
 let beautifier
 const emptyActiveData = { style: {}, autosize: {} }
 let oldActiveId
@@ -205,6 +207,7 @@ export default {
   },
   data() {
     return {
+      initDrawing:initDrawing,
       showDescPop:false,
       logo,
       idGlobal,
@@ -285,13 +288,27 @@ export default {
       immediate: true
     }
   },
-  mounted() {
-    if (Array.isArray(drawingListInDB) && drawingListInDB.length > 0) {
-      this.drawingList = drawingListInDB
-    } else {
+  async mounted() {
+    // if (Array.isArray(drawingListInDB) && drawingListInDB.length > 0) {
+    //   this.drawingList = drawingListInDB
+    // } else {
       //回写json
-      if(initDrawing&&Array.isArray(initDrawing['params'])){
-        initDrawing['params'].forEach((param,i)=>{
+      if(this.$route.query.orunid){
+        try{
+          let res =  await Request.post(GET_JSON,{orunid:this.$route.query.orunid})
+          this.initDrawing = res.htmlJson
+        }
+        catch(e){
+          console.log(e)
+           Toast({
+                message:e,
+                position:'middle',
+                duration:3000
+            })
+        }
+      }
+      if(this.initDrawing&&Array.isArray(this.initDrawing['params'])){
+        this.initDrawing['params'].forEach((param,i)=>{
           
           if(param.type!=='detail'){
              //非明细
@@ -321,24 +338,24 @@ export default {
       else{
         this.drawingList = drawingDefalut
       }
-    }
+    // }
   
 
     this.activeFormItem(this.drawingList[0])
     this.activeId=0
 
-    if (formConfInDB) {
-      this.formConf = formConfInDB
-    }
-    else {
-      if(initDrawing){
-        Object.keys(initDrawing).forEach((key,i)=>{
+    // if (formConfInDB) {
+    //   this.formConf = formConfInDB
+    // }
+    // else {
+      if(this.initDrawing){
+        Object.keys(this.initDrawing).forEach((key,i)=>{
           if(key!=='params'){
-            this.$set(this.formConf,key,initDrawing[key])
+            this.$set(this.formConf,key,this.initDrawing[key])
           }
         })
       }
-    }
+    // }
     loadBeautifier(btf => {
       beautifier = btf
     })
@@ -539,7 +556,7 @@ export default {
       this.AssembleFormData()
       let jsonString = JSON.stringify(this.formData)
       let beautifierJson = beautifier.js(jsonString, beautifierConf.js)
-      console.log(33333,beautifierJson)
+      console.log('saveJson...',beautifierJson)
       window.parent.parentSetJson(beautifierJson); 
     },
     download() {

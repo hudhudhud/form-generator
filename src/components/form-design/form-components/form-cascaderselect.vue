@@ -1,5 +1,5 @@
 <template>
-    <section class="cell-field" v-if='item.show!==false'>
+    <section class="cell-field" v-if='item.show!==false' v-bind="styClassAttr">
         <div class="cell-title" :class="{required:item.require}">
             <span class="cell-text">{{item.label}}</span>
         </div>
@@ -78,7 +78,11 @@ export default {
                 this.attrs={}
                 if(Array.isArray(attributes)){
                     attributes.forEach(at=>{
-                        if(at.name){
+                        if(!at.name)return
+                        if(at.name=='style'||at.name=='class'){
+                            this.styClassAttr[at.name]=at.value
+                        }
+                        else{
                             this.attrs[at.name]=at.value
                         }
                     })
@@ -171,8 +175,9 @@ export default {
             // emptySelectObj:{"label":'请选择',"value":''},
             firstLoad:true,
             initValueAry:[],
-            attrs:[],
-            localAttr:[]
+            attrs:{},
+            localAttr:{},
+            styClassAttr:{}
         }
     },
     methods:{

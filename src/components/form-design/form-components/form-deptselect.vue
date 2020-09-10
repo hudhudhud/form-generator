@@ -1,11 +1,11 @@
 <template>
-<section class="cell-field" v-if='item.show!==false'>
+<section class="cell-field" v-if='item.show!==false' v-bind="styClassAttr">
     <div class="cell-title" :class="{required:item.require}">
         <span class="cell-text">{{item.label}}</span>
     </div>
     <div class="cell-value">
         <template>
-            <input type="text" v-model='showValue' v-bind="attrs" v-on="listeners" readonly @click='deptPopVisible=true' :data-key='item.key' @focus="focus" ref="formInput">
+            <input type="text" v-model='showValue' v-bind="{...localAttr,...attrs}" v-on="listeners" readonly @click='deptPopVisible=true' :data-key='item.key' @focus="focus" ref="formInput">
             <div class="mint-field-clear" style="" v-if='!item.disableClear&&showValue' @click='showValue=""'>
                 <i class="mintui mintui-field-error"></i>
             </div>
@@ -80,7 +80,12 @@ export default {
                 if(Array.isArray(attributes)){
                     attributes.forEach(at=>{
                         if(at.name){
-                            this.attrs[at.name]=at.value
+                            if(at.name=='style'||at.name=='class'){
+                                this.styClassAttr[at.name]=at.value
+                            }
+                            else{
+                                this.attrs[at.name]=at.value
+                            }
                         }
                     })
                 }
@@ -109,7 +114,9 @@ export default {
             deptPopVisible:false,
             valueKey:this.item.valueKey?this.item.valueKey:'value',
             labelKey:this.item.labelKey?this.item.labelKey:'label',
-            attrs:[]
+            attrs:{},
+            localAttr:{},
+            styClassAttr:{}
         }
     },
     methods:{

@@ -1,5 +1,5 @@
 <template>
-<section class="cell-field" v-if='item.show!==false'>
+<section class="cell-field" v-if='item.show!==false' v-bind="styClassAttr">
     <div class="cell-title" :class="{required:item.require}">
         <span class="cell-text">{{item.label}}</span>
     </div>
@@ -48,7 +48,12 @@ export default {
                 if(Array.isArray(attributes)){
                     attributes.forEach(at=>{
                         if(at.name){
-                            this.attrs[at.name]=at.value
+                            if(at.name=='style'||at.name=='class'){
+                                this.styClassAttr[at.name]=at.value
+                            }
+                            else{
+                                this.attrs[at.name]=at.value
+                            }
                         }
                     })
                 }
@@ -101,7 +106,8 @@ export default {
             txt:this.value,
             errorInfo:'',
             attrs:{},
-            localAttr:{}
+            localAttr:{},
+            styClassAttr:{}
         }
     },
     methods:{
