@@ -4,7 +4,7 @@
     <div class="left-board">
       <div class="logo-wrapper">
         <div class="logo">
-          <img :src="logo" alt="logo"> Form Generator
+          <!-- <img :src="logo" alt="logo"> Form Generator -->
           <!-- <a class="github" href="https://github.com/JakHuang/form-generator" target="_blank">
             <img src="https://github.githubassets.com/pinned-octocat.svg" alt>
           </a> -->
@@ -493,7 +493,7 @@ export default {
           })
         }
       }) 
-      console.log(3333,resultList)     
+      // console.log(3333,resultList)     
       this.formData = {
         params: resultList,
         ...this.formConf
@@ -557,7 +557,8 @@ export default {
       let jsonString = JSON.stringify(this.formData)
       let beautifierJson = beautifier.js(jsonString, beautifierConf.js)
       console.log('saveJson...',beautifierJson)
-      window.parent.parentSetJson(beautifierJson); 
+      // window.parent.parentSetJson(beautifierJson); 
+      window.parent.postMessage(beautifierJson, 'http://mobileproxy.h3c.com:8027/')
     },
     download() {
       this.dialogVisible = true

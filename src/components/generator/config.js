@@ -320,6 +320,15 @@ export const otherComponents =[
       // "label":"hidden组件",
       "value":""//非必填，默认值
     },
+  },
+  {
+    __config__:{
+      "type":"html", //必填，组件类型
+      "key":"", //必填，字段名称；且为input元素上data-key属性值，获取值方法$("input[data-key='hidden-name']").val()
+      "label":"html备注组件",
+      "value":"",//非必填，默认值
+      "show":true,
+    },
   }
 ]
 

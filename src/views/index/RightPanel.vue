@@ -7,7 +7,7 @@
     <div class="field-box" v-if='activeData&&activeData.__config__'>
       <el-scrollbar class="right-scrollbar">
         <!-- 组件属性 -->
-        <el-form v-show="currentTab==='field' && showField &&activeData.__config__.type!='detail'" size="small" label-width="120px">
+        <el-form v-show="currentTab==='field' && showField &&activeData.__config__.type!='detail'" size="small" label-width="150px">
           <!-- <el-form-item v-if="activeData.__config__.changeTag" label="组件类型">
             <el-select
               v-model="activeData.__config__.type"
@@ -42,6 +42,9 @@
           <el-form-item  label="默认值" v-if='activeData.__config__.type=="checkbox"'>
             <el-switch v-model="activeData.__config__.value" />
           </el-form-item>
+          <el-form-item  label="描述值" v-if='activeData.__config__.type=="html"'>
+            <el-input type='textarea' :rows="5" v-model="activeData.__config__.value" placeholder="请输入描述" />
+          </el-form-item>
           <template v-else-if='["picker","searchSelect","addressBook","deptSelect","cascaderselect"].indexOf(activeData.__config__.type)>-1'>
               <el-form-item  label="默认值类型">
                 <el-radio-group v-model="activeData.defaultValueType" @change='defaultValueTypeChange'>
@@ -63,19 +66,19 @@
           <!-- <el-form-item v-if="activeData.__config__.placeholder!==undefined" label="占位提示">
             <el-input v-model="activeData.__config__.placeholder" placeholder="请输入占位提示"  />
           </el-form-item> -->
-          <el-form-item  label="是否必填" v-if='["hidden"].indexOf(activeData.__config__.type)==-1'>
+          <el-form-item  label="是否必填" v-if='["hidden","html"].indexOf(activeData.__config__.type)==-1'>
             <el-switch v-model="activeData.__config__.require"  />
           </el-form-item>
-          <el-form-item  label="是否禁用清除按钮" v-if='["fileUpload","textarea","hidden"].indexOf(activeData.__config__.type)==-1' >
+          <el-form-item  label="是否禁用清除按钮" v-if='["fileUpload","textarea","hidden","html"].indexOf(activeData.__config__.type)==-1' >
             <el-switch v-model="activeData.__config__.disableClear" />
           </el-form-item>
-          <el-form-item  label="是否只读" v-if='["fileUpload","hidden"].indexOf(activeData.__config__.type)==-1'>
+          <el-form-item  label="是否只读" v-if='["fileUpload","hidden","html"].indexOf(activeData.__config__.type)==-1'>
             <el-switch v-model="activeData.__config__.readonly" />
           </el-form-item>
           <el-form-item  label="是否显示" v-if='["hidden"].indexOf(activeData.__config__.type)==-1'>
             <el-switch v-model="activeData.__config__.show" />
           </el-form-item> 
-          <el-form-item  label="回调函数名称" v-if='["hidden","fileUpload","cascaderselect"].indexOf(activeData.__config__.type)==-1'>
+          <el-form-item  label="回调函数名称" v-if='["hidden","fileUpload","cascaderselect","html"].indexOf(activeData.__config__.type)==-1'>
             <el-input v-model="activeData.__config__.callback" placeholder="请输入回调函数名称" />
           </el-form-item>
           <!-- 搜索框属性 -->
@@ -543,7 +546,7 @@
               </el-radio-button>
             </el-radio-group>
           </el-form-item>
-          <section>
+          <section v-if='["html","hidden"].indexOf(activeData.__config__.type) == -1'>
             <el-divider>input属性</el-divider>
             <div
               v-for="(item, index) in activeData.__config__.attributes"
@@ -574,7 +577,7 @@
           </section>
         </el-form>
         <!-- 表单属性 -->
-        <el-form v-show="currentTab === 'form'" size="small" label-width="90px">
+        <el-form v-show="currentTab === 'form'" size="small" label-width="150px">
           <el-form-item label="初始化函数">
             <el-input v-model="formConf.init" placeholder="请输入初始化函数名称" />
           </el-form-item>
@@ -682,7 +685,7 @@
           </el-form-item> -->
         </el-form>
         <!-- 明细表单属性 -->
-        <el-form v-show="currentTab==='field' && showField && activeData.__config__.type=='detail'" size="small" label-width="90px">
+        <el-form v-show="currentTab==='field' && showField && activeData.__config__.type=='detail'" size="small" label-width="150px">
           <el-form-item  label="组件类型">
             <el-input v-model="activeData.__config__.type" readonly />
           </el-form-item>
@@ -1161,8 +1164,10 @@ export default {
 
 <style lang="scss" scoped>
 .right-board {
-  width: 400px;
+  // width: 400px;
+  // margin-left:860px;
   position: absolute;
+  left:860px;
   right: 0;
   top: 0;
   padding-top: 3px;
