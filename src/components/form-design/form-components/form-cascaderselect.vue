@@ -14,8 +14,8 @@
         </div>
         <p class="error-info">{{errorInfo}}</p>
         <div @touchmove.prevent>
-            <!-- <mt-popup v-model="popupVisible" position="middle" :closeOnClickModal='false'> -->
-            <section v-show='popupVisible' class="pop-bg">
+            <mt-popup v-model="popupVisible" position="middle" :closeOnClickModal='true'>
+            <!-- <section v-show='popupVisible' class="pop-bg"> -->
                 <div class="cascader-content pop-content">
                     <div class="select-item" v-for='(opt,i) of item.options' :key='i'>  
                         <span class="label">{{opt.label}}：</span>
@@ -31,8 +31,8 @@
                         <mt-button type="default" @click='popupVisible=false'>取消</mt-button>
                     </div>
                 </div>
-            </section>
-            <!-- </mt-popup> -->
+            <!-- </section> -->
+            </mt-popup>
         </div>
     </section>
 </template>
