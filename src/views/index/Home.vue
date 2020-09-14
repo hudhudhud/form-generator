@@ -74,6 +74,7 @@
         <el-scrollbar class="center-scrollbar">
           <el-row class="center-board-row" :gutter="formConf.gutter">
               <el-form
+              @submit.native.prevent
               :size="formConf.size"
               :label-position="formConf.labelPosition"
               :disabled="formConf.disabled"
