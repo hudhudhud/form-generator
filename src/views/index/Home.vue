@@ -559,7 +559,7 @@ export default {
       let beautifierJson = beautifier.js(jsonString, beautifierConf.js)
       console.log('saveJson...',beautifierJson)
       // window.parent.parentSetJson(beautifierJson); 
-      window.parent.postMessage(beautifierJson, 'http://mobileproxy.h3c.com:8027/')
+      window.parent.postMessage(beautifierJson, '*')
     },
     download() {
       this.dialogVisible = true
