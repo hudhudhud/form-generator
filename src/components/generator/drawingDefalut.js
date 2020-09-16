@@ -9,6 +9,7 @@ export default [
       "disableClear":false,//是否禁用清除按钮，默认false
       "readonly":false,//是否只读,默认false
       "show":true,//是否显示，默认为true,
+      "formId":100
     },
   },
   // {

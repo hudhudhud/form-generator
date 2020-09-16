@@ -23,6 +23,7 @@ const layouts = {
   colFormItem(h, currentItem, index, list) {
     const { activeItem } = this.$listeners
     const config = currentItem.__config__
+    if(!config)return
     const child = renderChildren.apply(this, arguments)
     let className = this.activeId === config.formId ? 'drawing-item active-from-item' : 'drawing-item'
     if (this.formConf.unFocusedComponentBorder) className += ' unfocus-bordered'
@@ -80,7 +81,7 @@ const layouts = {
 
 function renderChildren(h, currentItem, index, list) {
   const config = currentItem.__config__
-  if (!Array.isArray(config.params)) return null
+  if (!config||!Array.isArray(config.params)) return null
   return config.params.map((el, i) => {
     const layout = layouts[el.layout?el.layout:'colFormItem']
     if (layout) {

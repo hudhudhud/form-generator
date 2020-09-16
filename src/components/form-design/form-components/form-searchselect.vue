@@ -20,7 +20,7 @@
                      v-model="searchStr" :clearable="true">
                         <el-button slot="append" icon="el-icon-search" @click='search'></el-button>
                     </el-input>
-                    <div class="list" :class='{chooseMutiple:item.chooseMutiple,notContainSearch:item.showSearchInput==false}'
+                    <el-scrollbar class="list" :class='{chooseMutiple:item.chooseMutiple,notContainSearch:item.showSearchInput==false}'
                       
                         >
                             <template v-if='item.chooseMutiple'>
@@ -41,7 +41,7 @@
                                 <p v-if='searchStr'>没有找到相关数据</p>
                                 <p v-else>输入关键字搜索</p>
                             </div>
-                    </div>
+                    </el-scrollbar>
                     <div class="select-items" v-if='item.chooseMutiple&&selectItems.length'>
                         <el-tag v-for="(item,i) in selectItems" :key="i" closable style='margin-right:5px' @close='item.checked=false' effect="plain">
                             {{item[labelKey]}}
@@ -453,7 +453,7 @@ export default {
     box-sizing: border-box;
     position:relative;
     .list{
-        overflow-x: hidden;
+        overflow: hidden;
         margin-top:10px;
         height: calc(100% - 130px);
         &.chooseMutiple{
@@ -466,7 +466,6 @@ export default {
             }
         }
         padding-top:80px;
-        overflow-y:scroll;
         box-sizing: border-box;
         // display: flex;
         // flex-direction: column;

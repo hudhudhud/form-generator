@@ -408,56 +408,6 @@
           <el-form-item v-if="activeData.__config__.tag === 'el-cascader'" label="选项分隔符">
             <el-input v-model="activeData.separator" placeholder="请输入选项分隔符" />
           </el-form-item>
-         
-          <el-form-item v-if="isShowMin" label="最小值">
-            <el-input-number v-model="activeData.min" placeholder="最小值" />
-          </el-form-item>
-          <el-form-item v-if="isShowMax" label="最大值">
-            <el-input-number v-model="activeData.max" placeholder="最大值" />
-          </el-form-item>
-          <el-form-item v-if="activeData.height!==undefined" label="组件高度">
-            <el-input-number v-model="activeData.height" placeholder="高度" @input="changeRenderKey" />
-          </el-form-item>
-          <el-form-item v-if="isShowStep" label="步长">
-            <el-input-number v-model="activeData.step" placeholder="步数" />
-          </el-form-item>
-          <el-form-item v-if="activeData.__config__.tag === 'el-input-number'" label="精度">
-            <el-input-number v-model="activeData.precision" :min="0" placeholder="精度" />
-          </el-form-item>
-          <el-form-item v-if="activeData.__config__.tag === 'el-input-number'" label="按钮位置">
-            <el-radio-group v-model="activeData['controls-position']">
-              <el-radio-button label="">
-                默认
-              </el-radio-button>
-              <el-radio-button label="right">
-                右侧
-              </el-radio-button>
-            </el-radio-group>
-          </el-form-item>
-         
-         
-        
-          <!-- <el-form-item
-            v-if="activeData.type !== undefined && 'el-date-picker' === activeData.__config__.tag"
-            label="时间类型"
-          >
-            <el-select
-              v-model="activeData.type"
-              placeholder="请选择时间类型"
-              :style="{ width: '100%' }"
-              @change="dateTypeChange"
-            >
-              <el-option
-                v-for="(item, index) in dateOptions"
-                :key="index"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </el-form-item> -->
-          <el-form-item v-if="activeData.name !== undefined" label="文件字段名">
-            <el-input v-model="activeData.name" placeholder="请输入上传文件字段名" />
-          </el-form-item>
           <el-form-item v-if="activeData.accept !== undefined" label="文件类型">
             <el-select
               v-model="activeData.accept"
@@ -483,59 +433,6 @@
               </el-select>
             </el-input>
           </el-form-item>
-          <el-form-item v-if="activeData['range-separator'] !== undefined" label="分隔符">
-            <el-input v-model="activeData['range-separator']" placeholder="请输入分隔符" />
-          </el-form-item>
-          <el-form-item v-if="activeData['picker-options'] !== undefined" label="时间段">
-            <el-input
-              v-model="activeData['picker-options'].selectableRange"
-              placeholder="请输入时间段"
-            />
-          </el-form-item>
-          <el-form-item v-if="activeData.format !== undefined" label="时间格式">
-            <el-input
-              :value="activeData.format"
-              placeholder="请输入时间格式"
-              @input="setTimeValue($event)"
-            />
-          </el-form-item>
-          <template v-if="['el-checkbox-group', 'el-radio-group', 'el-select'].indexOf(activeData.__config__.tag) > -1">
-            <el-divider>选项</el-divider>
-            <draggable
-              :list="activeData.__slot__.options"
-              :animation="340"
-              group="selectItem"
-              handle=".option-drag"
-            >
-              <div v-for="(item, index) in activeData.__slot__.options" :key="index" class="select-item">
-                <div class="select-line-icon option-drag">
-                  <i class="el-icon-s-operation" />
-                </div>
-                <el-input v-model="item.label" placeholder="选项名" size="small" />
-                <el-input
-                  placeholder="选项值"
-                  size="small"
-                  :value="item.value"
-                  @input="setOptionValue(item, $event)"
-                />
-                <div class="close-btn select-line-icon" @click="activeData.__slot__.options.splice(index, 1)">
-                  <i class="el-icon-remove-outline" />
-                </div>
-              </div>
-            </draggable>
-            <div style="margin-left: 20px;">
-              <el-button
-                style="padding-bottom: 0"
-                icon="el-icon-circle-plus-outline"
-                type="text"
-                @click="addSelectItem"
-              >
-                添加选项
-              </el-button>
-            </div>
-            <el-divider />
-          </template>
-
           <el-form-item v-if="activeData.__config__.optionType !== undefined" label="选项样式">
             <el-radio-group v-model="activeData.__config__.optionType">
               <el-radio-button label="default">
@@ -645,44 +542,36 @@
               </el-button>
             </div>
           </section>
-          <!-- <el-form-item label="表单尺寸">
-            <el-radio-group v-model="formConf.size">
-              <el-radio-button label="medium">
-                中等
-              </el-radio-button>
-              <el-radio-button label="small">
-                较小
-              </el-radio-button>
-              <el-radio-button label="mini">
-                迷你
-              </el-radio-button>
-            </el-radio-group>
+          <!-- 模块化结构 -->
+          <el-divider>模块化结构</el-divider>
+             <el-form-item label="是否启用模块化结构">
+              <el-switch v-model="formConf.showAsModule" @change='showAsModuleChange' />
           </el-form-item>
-          <el-form-item label="标签对齐">
-            <el-radio-group v-model="formConf.labelPosition">
-              <el-radio-button label="left">
-                左对齐
-              </el-radio-button>
-              <el-radio-button label="right">
-                右对齐
-              </el-radio-button>
-              <el-radio-button label="top">
-                顶部对齐
-              </el-radio-button>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="标签宽度">
-            <el-input v-model.number="formConf.labelWidth" type="number" placeholder="请输入标签宽度" />
-          </el-form-item>
-          <el-form-item label="栅格间隔">
-            <el-input-number v-model="formConf.gutter" :min="0" placeholder="栅格间隔" />
-          </el-form-item>
-          <el-form-item label="表单按钮">
-            <el-switch v-model="formConf.formBtns" />
-          </el-form-item>
-          <el-form-item label="显示未选中组件边框">
-            <el-switch v-model="formConf.unFocusedComponentBorder" />
-          </el-form-item> -->
+           <section v-if='formConf.showAsModule'>
+            <div
+              v-for="(moduleItem, index) in drawListObj.list"
+              :key="index"
+              class="reg-item"
+            >
+              <span class="close-btn" @click="drawListObj.list.splice(index, 1)">
+                <i class="el-icon-close" />
+              </span>
+              <el-form-item label="模块名称">
+                <el-input v-model="moduleItem.module" placeholder="请输入模块名称" />
+              </el-form-item>
+              <el-form-item label="是否默认展开">
+                <el-switch v-model="moduleItem.active" />
+              </el-form-item>
+              <el-form-item label="模块样式（class）">
+                <el-input type='textarea' :row='4' v-model="moduleItem.class" placeholder="请输入模块样式" />
+              </el-form-item> 
+            </div>
+            <div style="margin-left: 20px">
+              <el-button icon="el-icon-circle-plus-outline" type="text" @click="addModuleBtn">
+                添加模块
+              </el-button>
+            </div>
+          </section>
         </el-form>
         <!-- 明细表单属性 -->
         <el-form v-show="currentTab==='field' && showField && activeData.__config__.type=='detail'" size="small" label-width="150px">
@@ -723,17 +612,8 @@ import {
   inputComponents, selectComponents
 } from '@/components/generator/config'
 import { saveFormConf } from '@/utils/db'
+import drawingDefalut from '@/components/generator/drawingDefalut'
 
-const dateTimeFormat = {
-  date: 'yyyy-MM-dd',
-  week: 'yyyy 第 WW 周',
-  month: 'yyyy-MM',
-  year: 'yyyy',
-  datetime: 'yyyy-MM-dd HH:mm:ss',
-  daterange: 'yyyy-MM-dd',
-  monthrange: 'yyyy-MM',
-  datetimerange: 'yyyy-MM-dd HH:mm:ss'
-}
 
 // 使changeRenderKey在目标组件改变时可用
 const needRerenderList = ['tinymce']
@@ -743,100 +623,14 @@ export default {
     TreeNodeDialog,
     IconsDialog
   },
-  props: ['showField', 'activeData', 'formConf'],
+  props: ['showField', 'activeData', 'formConf','drawListObj'],
   data() {
     return {
       currentTab: 'field',
       currentNode: null,
       dialogVisible: false,
       iconsVisible: false,
-      currentIconModel: null,
-      dateTypeOptions: [
-        {
-          label: '日(date)',
-          value: 'date'
-        },
-        {
-          label: '周(week)',
-          value: 'week'
-        },
-        {
-          label: '月(month)',
-          value: 'month'
-        },
-        {
-          label: '年(year)',
-          value: 'year'
-        },
-        {
-          label: '日期时间(datetime)',
-          value: 'datetime'
-        }
-      ],
-      dateRangeTypeOptions: [
-        {
-          label: '日期范围(daterange)',
-          value: 'daterange'
-        },
-        {
-          label: '月范围(monthrange)',
-          value: 'monthrange'
-        },
-        {
-          label: '日期时间范围(datetimerange)',
-          value: 'datetimerange'
-        }
-      ],
-      colorFormatOptions: [
-        {
-          label: 'hex',
-          value: 'hex'
-        },
-        {
-          label: 'rgb',
-          value: 'rgb'
-        },
-        {
-          label: 'rgba',
-          value: 'rgba'
-        },
-        {
-          label: 'hsv',
-          value: 'hsv'
-        },
-        {
-          label: 'hsl',
-          value: 'hsl'
-        }
-      ],
-      justifyOptions: [
-        {
-          label: 'start',
-          value: 'start'
-        },
-        {
-          label: 'end',
-          value: 'end'
-        },
-        {
-          label: 'center',
-          value: 'center'
-        },
-        {
-          label: 'space-around',
-          value: 'space-around'
-        },
-        {
-          label: 'space-between',
-          value: 'space-between'
-        }
-      ],
-      layoutTreeProps: {
-        label(data, node) {
-          const config = data.__config__
-          return data.componentName || `${config.label}: ${data.__vModel__}`
-        }
-      }
+      currentIconModel: null
     }
   },
   computed: {
@@ -870,18 +664,6 @@ export default {
         }
       ]
     },
-    activeTag() {
-      return this.activeData.__config__.tag
-    },
-    isShowMin() {
-      return ['el-input-number', 'el-slider'].indexOf(this.activeTag) > -1
-    },
-    isShowMax() {
-      return ['el-input-number', 'el-slider', 'el-rate'].indexOf(this.activeTag) > -1
-    },
-    isShowStep() {
-      return ['el-input-number', 'el-slider'].indexOf(this.activeTag) > -1
-    }
   },
   watch: {
     formConf: {
@@ -987,13 +769,6 @@ export default {
     addNode(data) {
       this.currentNode.push(data)
     },
-    setOptionValue(item, val) {
-      item.value = isNumberStr(val) ? +val : val
-    }, 
-    setOptionValue1(index,val) {
-      console.log(22222,index,val)
-     this.activeData.__config__.options[index]=val
-    },
     setDefaultValue(val) {
       if (Array.isArray(val)) {
         return val.join(',')
@@ -1005,45 +780,6 @@ export default {
         return `${val}`
       }
       return val
-    },
-    onDefaultValueInput(str) {
-      if (isArray(this.activeData.__config__.defaultValue)) {
-        // 数组
-        this.$set(
-          this.activeData.__config__,
-          'defaultValue',
-          str.split(',').map(val => (isNumberStr(val) ? +val : val))
-        )
-      } else if (['true', 'false'].indexOf(str) > -1) {
-        // 布尔
-        this.$set(this.activeData.__config__, 'defaultValue', JSON.parse(str))
-      } else {
-        // 字符串和数字
-        this.$set(
-          this.activeData.__config__,
-          'defaultValue',
-          isNumberStr(str) ? +str : str
-        )
-      }
-    },
-    onSwitchValueInput(val, name) {
-      if (['true', 'false'].indexOf(val) > -1) {
-        this.$set(this.activeData, name, JSON.parse(val))
-      } else {
-        this.$set(this.activeData, name, isNumberStr(val) ? +val : val)
-      }
-    },
-    setTimeValue(val, type) {
-      const valueFormat = type === 'week' ? dateTimeFormat.date : val
-      this.$set(this.activeData.__config__, 'defaultValue', null)
-      this.$set(this.activeData, 'value-format', valueFormat)
-      this.$set(this.activeData, 'format', val)
-    },
-    spanChange(val) {
-      this.formConf.span = val
-    },
-    multipleChange(val) {
-      this.$set(this.activeData.__config__, 'defaultValue', val ? [] : '')
     },
     dateTypeChange(val) {
       this.setTimeValue(dateTimeFormat[val], val)
@@ -1157,6 +893,43 @@ export default {
           "needValid":false,//表单是否需要校验，默认为false
           "style":"" //自定义按钮样式
       })
+    },
+    addModuleBtn(){
+      // if(!Array.isArray(this.drawList)){
+      //  this.drawList=[]
+      // }
+      this.drawListObj.list.push({
+          "module":"模块信息",
+          "active": true, 
+          "class":"",
+          "params":[]
+      })
+    },
+    async showAsModuleChange(val){
+      try{
+        if(this.drawListObj.list&&this.drawListObj.list.length){
+          await this.$confirm('此操作将丢失已有设计, 是否继续?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            })
+        }
+        if(val){
+            this.drawListObj.list=[]
+            this.drawListObj.list.push({
+                "module":"模块信息",
+                "active": true, 
+                "class":"",
+                "params":[]
+            })
+        }
+        else{
+            this.drawListObj.list=drawingDefalut
+        }
+      }
+      catch(e){
+        this.formConf.showAsModule=!this.formConf.showAsModule
+      }
     }
   }
 }

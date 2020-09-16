@@ -33,6 +33,8 @@ export const formConf = {
   //     //     "style":"background-color:green;color:#fff" //自定义按钮样式
   //     // }        
   // ]
+  showAsModule:false,
+  syncToWorkFlow:true
 }
 
 // 输入型组件 【左面板】
@@ -326,7 +328,7 @@ export const otherComponents =[
       "type":"html", //必填，组件类型
       "key":"", //必填，字段名称；且为input元素上data-key属性值，获取值方法$("input[data-key='hidden-name']").val()
       "label":"html备注组件",
-      "value":"",//非必填，默认值
+      "value":"html备注组件",//非必填，默认值
       "show":true,
     },
   }

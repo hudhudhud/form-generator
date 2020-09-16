@@ -4,10 +4,6 @@
     <div class="left-board">
       <div class="logo-wrapper">
         <div class="logo">
-          <!-- <img :src="logo" alt="logo"> Form Generator -->
-          <!-- <a class="github" href="https://github.com/JakHuang/form-generator" target="_blank">
-            <img src="https://github.githubassets.com/pinned-octocat.svg" alt>
-          </a> -->
         </div>
       </div>
       <el-scrollbar class="left-scrollbar">
@@ -49,20 +45,11 @@
 
     <div class="center-board">
       <div class="action-bar">
-        <!-- <el-button icon="el-icon-video-play" type="text" @click="run">
-          运行
-        </el-button> -->
-       
-        <!-- <el-button icon="el-icon-download" type="text" @click="download">
-          导出vue文件
-        </el-button>
-        <el-button class="copy-btn-main" icon="el-icon-document-copy" type="text" @click="copy">
-          复制代码
-        </el-button> -->
+        <div style='display:inline-block;font-size:13px;margin-right:10px'>同步到流程引擎 <el-switch v-model="formConf.syncToWorkFlow" /></div>
         <el-button class="delete-btn" icon="el-icon-delete" type="text" @click="empty">
           清空
         </el-button>
-        <el-button icon="el-icon-download" type="text" @click="confirmJson">
+        <el-button icon="el-icon-check" type="text" @click="confirmJson">
           保存
         </el-button>
         <el-button icon="el-icon-view" type="text" @click="showJson">
@@ -70,8 +57,8 @@
         </el-button>
       </div>
     
-      <div class="phone">
-        <el-scrollbar class="center-scrollbar">
+      <div class="center-scrollbar">
+        <div class="phone">
           <el-row class="center-board-row" :gutter="formConf.gutter">
               <el-form
               @submit.native.prevent
@@ -80,24 +67,65 @@
               :disabled="formConf.disabled"
               :label-width="formConf.labelWidth + 'px'"
             > 
-              <div class="form-container"  :class="{'show':Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length,}">
+              <el-scrollbar class="form-container"  :class="{'show':Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length,}">
                  <div v-if='formConf.descHtml' v-html='formConf.descHtml' class="desc-html">
                 </div>
-                <draggable class="drawing-board" :list="drawingList" :animation="340" group="componentsGroup">
-                  <draggable-item
-                    v-for="(item, index) in drawingList"
-                    :key="item.renderKey"
-                    :drawing-list="drawingList"
-                    :current-item="item"
-                    :index="index"
-                    :active-id="activeId"
-                    :form-conf="formConf"
-                    @activeItem="activeFormItem($event,index)"
-                    @copyItem="drawingItemCopy"
-                    @deleteItem="drawingItemDelete"
-                    :class="{actived:activeId == index}"
-                  />
-                </draggable>
+                <!-- 整体结构展示 -->
+                <template v-if='!formConf.showAsModule'>   
+                  <draggable class="drawing-board" :list="drawingList" :animation="340" group="componentsGroup">
+                    <draggable-item
+                      v-for="(item, index) in drawingList"
+                      :key="item.renderKey"
+                      :drawing-list="drawingList"
+                      :current-item="item"
+                      :index="index"
+                      :active-id="activeId"
+                      :form-conf="formConf"
+                      @activeItem="activeFormItem($event,index)"
+                      @copyItem="drawingItemCopy"
+                      @deleteItem="drawingItemDelete"
+                    />
+                  </draggable>
+                </template>
+                <!-- 模块结构展示 -->
+                <template v-else>
+                  <template v-for='(moduleItem,i) in drawingList'>
+                     <el-collapse v-if='moduleItem.module' :key='i' v-model='activeNames'>
+                      <el-collapse-item :title="moduleItem.module" :name="moduleItem.module" 
+                       :class="{[moduleItem.class]:true,'active-el-collapse':activeModuleIndex==i}" 
+                      @click.native='activeModuleItem(i)'>
+                         <draggable class="drawing-board" :list="moduleItem.params" :animation="340" group="componentsGroup">
+                            <draggable-item
+                              v-for="(item, index) in moduleItem.params"
+                              :key="item.renderKey"
+                              :drawing-list="moduleItem.params"
+                              :current-item="item"
+                              :index="index"
+                              :active-id="activeId"
+                              :form-conf="formConf"
+                              @activeItem="activeFormItem($event,index)"
+                              @copyItem="drawingItemCopy"
+                              @deleteItem="drawingItemDelete"
+                            />
+                        </draggable>
+                      </el-collapse-item>
+                     </el-collapse>
+                      <draggable class="drawing-board" v-else :list="moduleItem.params" :animation="340" group="componentsGroup" :key='i'>
+                          <draggable-item
+                            v-for="(item, index) in moduleItem.params"
+                            :key="item.renderKey"
+                            :drawing-list="moduleItem.params"
+                            :current-item="item"
+                            :index="index"
+                            :active-id="activeId"
+                            :form-conf="formConf"
+                            @activeItem="activeFormItem($event,index)"
+                            @copyItem="drawingItemCopy"
+                            @deleteItem="drawingItemDelete"
+                          />
+                      </draggable>
+                  </template>
+                </template>
                 <div v-show="!drawingList.length" class="empty-info">
                   从左侧拖入或点选组件进行表单设计
                 </div>
@@ -117,10 +145,10 @@
                   </template>
                   <el-button type="default">返回</el-button>
               </div> 
-              </div>
+              </el-scrollbar>
             </el-form>
           </el-row>
-        </el-scrollbar>
+        </div>
        
       </div>
     </div>
@@ -129,6 +157,7 @@
       :active-data="activeData"
       :form-conf="formConf"
       :show-field="!!drawingList.length"
+      :draw-list-obj ="drawingListObj"
       @tag-change="tagChange"
     />
 
@@ -184,7 +213,7 @@ import {
 } from '@/utils/db'
 import loadBeautifier from '@/utils/loadBeautifier'
 import Popup from '@/components/popup'
-import {GET_JSON} from '@/utils/api'
+import {GET_JSON,SAVE_JSON} from '@/utils/api'
 import Request from '@/utils/request'
 import {Toast} from 'mint-ui'
 let beautifier
@@ -208,6 +237,8 @@ export default {
   },
   data() {
     return {
+      systemid:'',
+      activeModuleIndex:0,
       initDrawing:initDrawing,
       showDescPop:false,
       logo,
@@ -219,6 +250,7 @@ export default {
       detailComponents,
       labelWidth: 100,
       drawingList: [],//drawingDefalut,
+      drawingListObj:{},
       drawingData: {},
       activeId: '',//drawingDefalut[0].formId,
       drawerVisible: false,
@@ -256,8 +288,27 @@ export default {
     }
   },
   computed: {
+    activeNames: {
+      get: function() {
+        let res = []
+        if(this.formConf.showAsModule){
+          res = this.drawingList.filter(it=>it.active).map(it=>it.module)
+        }
+        return res
+      },
+      set: function() {}
+    }
+    // drawingListObj(){
+    //   return {list:this.drawingList}
+    // }
   },
   watch: {
+    drawingListObj:{
+      handler(val){
+        this.drawingList = val.list
+      },
+      deep:true
+    },
     // eslint-disable-next-line func-names
     'activeData.__config__.label': function (val, oldVal) {
       if (
@@ -298,6 +349,13 @@ export default {
         try{
           let res =  await Request.post(GET_JSON,{orunid:this.$route.query.orunid})
           this.initDrawing = res.htmlJson
+          this.systemid = res.systemid
+          if(this.initDrawing.modules){
+            this.$set(this.formConf,"showAsModule",true)
+          }
+          else{
+            this.$set(this.formConf,"showAsModule",false)
+          }
         }
         catch(e){
           console.log(e)
@@ -308,42 +366,85 @@ export default {
             })
         }
       }
-      if(this.initDrawing&&Array.isArray(this.initDrawing['params'])){
-        this.initDrawing['params'].forEach((param,i)=>{
-          
-          if(param.type!=='detail'){
-             //非明细
-            let res = this.settingInitJson(param)
-            this.drawingList.push(res)
-          }
-          else{
-            //明细
-            let obj = {}
-            Object.keys(param).forEach(key=>{
-              if(key!=='params'){
-                obj[key]=param[key]
+      if(this.initDrawing){
+        if(Array.isArray(this.initDrawing['params'])){
+          this.initDrawing['params'].forEach((param,i)=>{
+            if(param.type!=='detail'){
+              //非明细
+              let res = this.settingInitJson(param)
+              this.drawingList.push(res)
+            }
+            else{
+              //明细
+              let obj = {}
+              Object.keys(param).forEach(key=>{
+                if(key!=='params'){
+                  obj[key]=param[key]
+                }
+                else{
+                  obj[key] = param[key].map(item=>{
+                    return this.settingInitJson(item)
+                    // {
+                    //   __config__:deepClone(item)
+                    // }
+                  })
+                }
+              })
+              this.drawingList.push({__config__:{...obj},layout:'rowFormItem'})
+            }
+          })
+          this.drawingList.forEach(it=>{this.createIdAndKey(it)})
+        }
+        else if(Array.isArray(this.initDrawing['modules'])){
+          this.initDrawing["modules"].forEach((moduleItem,i)=>{
+            let paramsList = []
+            moduleItem['params'].forEach((param,i)=>{
+              if(param.type!=='detail'){
+                //非明细
+                let res = this.settingInitJson(param)
+                paramsList.push(res)
               }
               else{
-                obj[key] = param[key].map(item=>{
-                  return this.settingInitJson(item)
-                  // {
-                  //   __config__:deepClone(item)
-                  // }
+                //明细
+                let obj = {}
+                Object.keys(param).forEach(key=>{
+                  if(key!=='params'){
+                    obj[key]=param[key]
+                  }
+                  else{
+                    obj[key] = param[key].map(item=>{
+                      return this.settingInitJson(item)
+                      // {
+                      //   __config__:deepClone(item)
+                      // }
+                    })
+                  }
                 })
+                paramsList.push({__config__:{...obj},layout:'rowFormItem'})
               }
             })
-            this.drawingList.push({__config__:{...obj},layout:'rowFormItem'})
-          }
-        })
+            paramsList.forEach(it=>{this.createIdAndKey(it)})
+            this.drawingList.push({module:moduleItem.module,active:moduleItem.active,class:moduleItem.class,params:paramsList})
+          })
+        }
       }
       else{
         this.drawingList = drawingDefalut
+        this.activeId=100
       }
     // }
   
-
-    this.activeFormItem(this.drawingList[0])
-    this.activeId=0
+    this.drawingListObj={list:this.drawingList}
+    if(!this.formConf.showAsModule){
+      this.activeFormItem(this.drawingList[0])
+    }
+    else{
+      this.activeModuleIndex=0
+      if(this.drawingList.length&&this.drawingList[0].params.length){
+        this.activeFormItem(this.drawingList[0].params[0])
+      }
+    }
+    
 
     // if (formConfInDB) {
     //   this.formConf = formConfInDB
@@ -351,7 +452,7 @@ export default {
     // else {
       if(this.initDrawing){
         Object.keys(this.initDrawing).forEach((key,i)=>{
-          if(key!=='params'){
+          if(key!=='params'&&key!=='modules'){
             this.$set(this.formConf,key,this.initDrawing[key])
           }
         })
@@ -430,7 +531,10 @@ export default {
     },
     activeFormItem(currentItem,index) {
       this.activeData = currentItem
-      this.activeId = index//currentItem.__config__.formId
+      this.activeId = currentItem.__config__.formId
+    },
+    activeModuleItem(index){
+      this.activeModuleIndex = index
     },
     onEnd(obj) {
       if (obj.from !== obj.to) {
@@ -448,8 +552,16 @@ export default {
         this.activeData.__config__.params.push(clone)
       }
       else{
-        this.drawingList.push(clone)
-        this.activeFormItem(clone)
+        if(!this.formConf.showAsModule){
+          this.drawingList.push(clone)
+          this.activeFormItem(clone)
+        }
+        else{
+          if(!Array.isArray(this.drawingList[this.activeModuleIndex].params)){
+            this.drawingList[this.activeModuleIndex].params=[]
+          }
+          this.drawingList[this.activeModuleIndex].params.push(clone)
+        }
       }
     },
     cloneComponent(origin) {
@@ -465,39 +577,72 @@ export default {
       const config = item.__config__
       config.formId = ++this.idGlobal
       config.renderKey = `${config.formId}${+new Date()}` // 改变renderKey后可以实现强制更新组件
-      if (config.layout === 'colFormItem') {
-        item.__vModel__ = `field${this.idGlobal}`
-      } else if (config.layout === 'rowFormItem') {
-        config.componentName = `row${this.idGlobal}`
-        !Array.isArray(config.params) && (config.params = [])
-        delete config.label // rowFormItem无需配置label属性
-      }
+      // if (config.layout === 'colFormItem') {
+      //   item.__vModel__ = `field${this.idGlobal}`
+      // } else if (config.layout === 'rowFormItem') {
+      //   config.componentName = `row${this.idGlobal}`
+      //   !Array.isArray(config.params) && (config.params = [])
+      //   delete config.label // rowFormItem无需配置label属性
+      // }
       if (Array.isArray(config.params)) {
         config.params = config.params.map(childItem => this.createIdAndKey(childItem))
       }
       return item
     },
     AssembleFormData() {
-      let draList = this.drawingList.map(it=>it.__config__)
-      let resultList = deepClone(draList)
-      resultList.forEach(it=>{
-        delete it.formId
-        delete it.renderKey
-        delete it.componentName
-        if(it.type=='detail'){
-          if(!it.params)it.params=[]
-          it.params = it.params.map(it=>it.__config__)
-          it.params.forEach(item=>{
-            delete item.formId
-            delete item.renderKey
-            delete it.componentName
-          })
+      if(!this.formConf.showAsModule){
+        let draList = this.drawingList.map(it=>it.__config__)
+        let resultList = deepClone(draList)
+        resultList.forEach(it=>{
+          delete it.formId
+          delete it.renderKey
+          delete it.componentName
+          if(it.type=='detail'){
+            if(!it.params)it.params=[]
+            it.params = it.params.map(it=>it.__config__)
+            it.params.forEach(item=>{
+              delete item.formId
+              delete item.renderKey
+              delete item.componentName
+            })
+          }
+        }) 
+        // console.log(3333,resultList)     
+        this.formData = {
+          params: resultList,
+          ...this.formConf
         }
-      }) 
-      // console.log(3333,resultList)     
-      this.formData = {
-        params: resultList,
-        ...this.formConf
+      }
+      else{
+        let resultList =[]
+        this.drawingList.forEach(moduleItem=>{
+           let obj = deepClone(moduleItem)
+           if(!Array.isArray(obj.params)){
+             obj.params = []
+           }
+           let params = obj.params.map(item=>item.__config__)
+           params.forEach(it=>{
+              delete it.formId
+              delete it.renderKey
+              delete it.componentName
+              if(it.type=='detail'){
+                if(!it.params)it.params=[]
+                it.params = it.params.map(it=>it.__config__)
+                it.params.forEach(item=>{
+                  delete item.formId
+                  delete item.renderKey
+                  delete item.componentName
+                })
+              }
+           })
+           obj.params = params
+           resultList.push(obj)
+        })
+        this.formData = {
+          modules: resultList,
+          ...this.formConf
+        }
+        console.log(1111111,this.formData)
       }
     },
     generate(data) {
@@ -521,7 +666,7 @@ export default {
       this.$confirm('确定要清空所有组件吗？', '提示', { type: 'warning' }).then(
         () => {
           this.drawingList = []
-          this.formConf={}
+          // this.formConf={}
           this.idGlobal = 100
         }
       )
@@ -537,7 +682,9 @@ export default {
       this.$nextTick(() => {
         const len = this.drawingList.length
         if (len) {
-          this.activeFormItem(this.drawingList[len - 1])
+          if(!this.formConf.showAsModule){
+            this.activeFormItem(this.drawingList[len - 1])
+          }
         }
       })
     },
@@ -553,13 +700,79 @@ export default {
       this.AssembleFormData()
       this.jsonDrawerVisible = true
     },
-    confirmJson(){
+    async confirmJson(){
       this.AssembleFormData()
       let jsonString = JSON.stringify(this.formData)
       let beautifierJson = beautifier.js(jsonString, beautifierConf.js)
-      console.log('saveJson...',beautifierJson)
+      console.log('formJson...',beautifierJson)
       // window.parent.parentSetJson(beautifierJson); 
-      window.parent.postMessage(beautifierJson, '*')
+      // window.parent.postMessage(beautifierJson, '*')
+      //构造流程引擎json
+      let readJson = ''
+      if(this.formConf.syncToWorkFlow){
+        readJson =  this.buildReadJson(beautifierJson)
+        //return 
+      }
+      try{
+          let res =  await Request.post(SAVE_JSON,{orunid:this.$route.query.orunid,
+          fromJson:beautifierJson,readJson,systemid:this.systemid})
+          if(res.code==0){
+            this.$message({ message: '保存成功！', type: 'success' });
+          }
+          else{
+            Toast({ message:res.msg, position:'middle', duration:3000 })
+          }
+        }
+        catch(e){
+          console.log(e)
+          Toast({  message:e, position:'middle', duration:3000 })
+        }
+    },
+    //构造流程引擎json
+    buildReadJson(beautifierJson){
+      let json = JSON.parse(beautifierJson)
+      let resAry = []
+      if(this.formConf.showAsModule){
+        if(Array.isArray(json.modules)&&json.modules.length){
+          json.modules.forEach((moduleItem,index)=>{
+            let ary = []
+            let obj = {
+              "groupIndex":index,
+              "groupLabel":moduleItem.module?moduleItem.module:'其他信息',
+              "groupType":"1",
+              "details":[ary]
+            }
+            if(Array.isArray(moduleItem.params)&&moduleItem.params.length){
+              moduleItem.params.forEach(it=>{
+                if(['hidden','html','fileUpload',"detail"].indexOf(it.type)==-1){
+                  ary.push({ "label":it.label,"value":it.key})
+                }
+              })
+            }
+            resAry.push(obj)
+          })
+        }
+      }
+      else{
+        let ary = []
+        let obj = {
+          "groupIndex":0,
+          "groupLabel":"详细信息",
+          "groupType":"1",
+          "details":[ary]
+        }
+        if(Array.isArray(json.params)&&json.params.length){
+          json.params.forEach(it=>{
+            if(['hidden','html','fileUpload',"detail"].indexOf(it.type)==-1){
+              ary.push({ "label":it.label,"value":it.key})
+            }
+          })
+        }
+        resAry.push(obj)
+      }
+      let readJson=beautifier.js(JSON.stringify(resAry), beautifierConf.js)
+      console.log("readJson...",readJson)
+      return readJson
     },
     download() {
       this.dialogVisible = true
@@ -607,9 +820,16 @@ export default {
       }
     },
     refreshJson(data) {
-      this.drawingList = deepClone(data.params)
-      delete data.params
-      this.formConf = data
+      // if(!this.formConf.showAsModule){
+      //   this.drawingList = deepClone(data.params)
+      //   delete data.params
+      //   this.formConf = data
+      // }
+      // else{
+      //   this.drawingList = deepClone(data)
+      //   delete data.modules
+      //   this.formConf = data
+      // }
     }
   }
 }
@@ -624,8 +844,9 @@ export default {
     background-image: url('../../assets/phone.png');
     background-repeat: no-repeat;
     background-size: 100%;
-    height: 100%;
-    padding: 100px 16px;
+    background-position-y:10px;
+    height: calc(100% - 50px);
+    padding: 100px 16px 0 16px;
     box-sizing: border-box;
     width: 375px;
     margin: auto;
@@ -637,20 +858,24 @@ export default {
       width:100%;
       box-sizing: border-box;
       overflow: hidden;
+      background-color:#fff;
        //position:fixed元素滚动时需要固定位置，因此增加相对定位容器
       .form-container{
         padding-top:10px;
         position:relative;
         width:100%;
         height:100%;
-        overflow: auto;
+        // overflow: auto;
         box-sizing: border-box;
          &.show{
           padding-bottom:60px;
         }
       }
       .actived{
-        border:1px solid red;
+        // border:1px solid red;
+      }
+      ::v-deep.active-from-item{
+        border: 1px dashed red !important;//$lighterBlue;
       }
     }
     .desc-html{
@@ -688,6 +913,32 @@ export default {
             justify-content: unset;
         }
         
+    }
+}
+</style>
+<style lang='scss'>
+.el-collapse-item{
+    padding:10px;
+    box-sizing:border-box;
+}
+.active-el-collapse{
+  border:1px dashed blue;
+}
+.el-collapse-item__header{
+    padding: 0 10px;
+    box-sizing: border-box;
+    font-size: 16px;
+    font-weight:bold;
+    background-color:#E5E3E0;
+    border-radius:5px;
+}
+.el-collapse-item__wrap{
+  padding-top:10px;
+}
+.el-collapse-item__content{
+    padding-bottom:0px;
+    .cell-field:first-child{
+        border-top:none;
     }
 }
 </style>

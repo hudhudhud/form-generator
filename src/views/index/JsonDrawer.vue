@@ -2,10 +2,10 @@
   <div>
     <el-drawer v-bind="$attrs" v-on="$listeners" @opened="onOpen" @close="onClose">
       <div class="action-bar" :style="{'text-align': 'left'}">
-        <span class="bar-btn" @click="refresh">
+        <!-- <span class="bar-btn" @click="refresh">
           <i class="el-icon-refresh" />
           刷新
-        </span>
+        </span> -->
         <span ref="copyBtn" class="bar-btn copy-json-btn">
           <i class="el-icon-document-copy" />
           复制JSON

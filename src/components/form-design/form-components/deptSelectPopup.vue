@@ -1,7 +1,7 @@
 <template>
     <mt-popup v-model="popupVisible" position="bottom" :closeOnClickModal='false' :modal='false'>
         <div class="search-content" >
-            <div class="list" :class='{chooseMutiple:chooseMutiple}'>
+            <el-scrollbar class="list" :class='{chooseMutiple:chooseMutiple}'>
                 <template v-if='chooseMutiple'>
                     <div v-for='(it,i) of list'  :key='i' class="item">
                         <el-checkbox  v-model='it.checked' >
@@ -23,7 +23,7 @@
                 <div class="tip-txt" v-if='!loading&&(!list||!list.length)'>
                     <p>没有相关数据</p>
                 </div>
-            </div>
+            </el-scrollbar>
             <div class="select-items" v-if='chooseMutiple&&selectItems.length'>
                 <el-tag v-for="(item,i) in selectItems" :key="i" closable style='margin-right:5px' @close='item.checked=false' effect="plain">
                     {{item.selectName}}
@@ -203,15 +203,15 @@ export default {
     padding:15px;
     box-sizing :border-box;
     position:relative;
+    overflow: hidden;
     .list{
-        overflow-x: hidden;
+        overflow: hidden;
         margin-top:10px;
         height  :calc(100% - 95px);
         &.chooseMutiple{
             height : calc(100% - 135px);
         }
         padding-top:80px;
-        overflow-y:scroll;
         box-sizing : border-box;
         // display: flex;
         // flex-direction: column;
