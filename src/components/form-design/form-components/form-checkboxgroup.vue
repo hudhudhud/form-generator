@@ -1,5 +1,5 @@
 <template>
-    <section class="cell-field" v-if='item.show!==false'>
+    <section class="cell-field">
         <div class="cell-title" :class="{required:item.require}">
             <span class="cell-text">{{item.label}}</span>
         </div>

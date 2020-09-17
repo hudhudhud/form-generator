@@ -1,5 +1,5 @@
 <template>
-<section class="cell-field" v-if='item.show!==false'>
+<section class="cell-field">
     <div class="cell-value">
         <div v-html='item.value' :data-key='item.key'></div>
     </div>
