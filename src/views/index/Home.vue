@@ -713,9 +713,14 @@ export default {
         readJson =  this.buildReadJson(beautifierJson)
         //return 
       }
+      if(!this.$route.query.orunid){
+        Toast({ message:'保存失败，缺少orunid参数！', position:'middle', duration:3000 })
+        return
+      }
+
       try{
           let res =  await Request.post(SAVE_JSON,{orunid:this.$route.query.orunid,
-          fromJson:beautifierJson,readJson,systemid:this.systemid})
+          formJson:beautifierJson,readJson,systemid:this.systemid})
           if(res.code==0){
             this.$message({ message: '保存成功！', type: 'success' });
           }
