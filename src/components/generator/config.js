@@ -287,6 +287,15 @@ export const selectComponents = [
 export const otherComponents =[
   {
     __config__: {
+        "type":"label",//必填，组件类型
+        "value":"",
+        "key":"",      //必填，字段名称
+        "label":"label显示组件" ,
+        "show":true,//是否显示，默认为true,
+    },
+  },
+  {
+    __config__: {
         "type":"fileUpload",//必填，组件类型
         "key":"",      //必填，字段名称
         "label":"文件上传" ,

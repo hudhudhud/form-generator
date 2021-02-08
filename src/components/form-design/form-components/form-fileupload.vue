@@ -4,13 +4,13 @@
         <span class="cell-text">{{item.label}}</span>
     </div>
     <div class="cell-value">
-        <a href="javascript:;" class="a-upload" v-if='!onlyShowIn'>
+        <a href="javascript:;" class="a-upload" v-if='!onlyShowIn&&!item.readonly'>
             <span class="btn-txt">添加附件</span>
             <input type="file" :accept="item.accept?item.accept:'*'" v-bind="$attrs" v-on="listeners" @change='fileUpload'
             :multiple='item.multiple'>
         </a>
         <div class="file-items" v-if='fileList.length'>
-            <template>
+            <template v-if='!onlyShowIn&&!item.readonly'>
                 <div class="el-tag el-tag--plain" style="margin-right: 5px;" v-for="(item,i) in fileList" :key="i" >
                     <span>{{item.name}}</span>
                     <i class="el-tag__close el-icon-close"  @click='showFileDialog(i,item)' v-if="item.fileId"></i> 

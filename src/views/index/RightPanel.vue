@@ -66,19 +66,22 @@
           <!-- <el-form-item v-if="activeData.__config__.placeholder!==undefined" label="占位提示">
             <el-input v-model="activeData.__config__.placeholder" placeholder="请输入占位提示"  />
           </el-form-item> -->
-          <el-form-item  label="是否必填" v-if='["hidden","html"].indexOf(activeData.__config__.type)==-1'>
+          <el-form-item  label="是否必填" v-if='["hidden","html","label"].indexOf(activeData.__config__.type)==-1'>
             <el-switch v-model="activeData.__config__.require"  />
           </el-form-item>
-          <el-form-item  label="是否禁用清除按钮" v-if='["fileUpload","textarea","hidden","html"].indexOf(activeData.__config__.type)==-1' >
+          <el-form-item  label="必填提示信息" v-if='["hidden","html","label"].indexOf(activeData.__config__.type)==-1&&activeData.__config__.require'>
+            <el-input v-model="activeData.__config__.message" placeholder="必填提示信息" />
+          </el-form-item>
+          <el-form-item  label="是否禁用清除按钮" v-if='["fileUpload","textarea","hidden","html","label"].indexOf(activeData.__config__.type)==-1' >
             <el-switch v-model="activeData.__config__.disableClear" />
           </el-form-item>
-          <el-form-item  label="是否只读" v-if='["fileUpload","hidden","html"].indexOf(activeData.__config__.type)==-1'>
+          <el-form-item  label="是否只读" v-if='["hidden","html","label"].indexOf(activeData.__config__.type)==-1'>
             <el-switch v-model="activeData.__config__.readonly" />
           </el-form-item>
           <el-form-item  label="是否显示" v-if='["hidden"].indexOf(activeData.__config__.type)==-1'>
             <el-switch v-model="activeData.__config__.show" />
           </el-form-item> 
-          <el-form-item  label="回调函数名称" v-if='["hidden","fileUpload","cascaderselect","html"].indexOf(activeData.__config__.type)==-1'>
+          <el-form-item  label="回调函数名称" v-if='["hidden","fileUpload","cascaderselect","html","label"].indexOf(activeData.__config__.type)==-1'>
             <el-input v-model="activeData.__config__.callback" placeholder="请输入回调函数名称" />
           </el-form-item>
           <!-- 搜索框属性 -->
@@ -593,6 +596,15 @@
           </el-form-item> -->
           <el-form-item  label="提交前调用函数名称" v-if='activeData.__config__.mode=="pop"'>
            <el-input v-model="activeData.__config__.beforeSave" placeholder="请输入提交函数" />
+          </el-form-item>
+          <el-form-item label="是否禁止明细新增">
+            <el-switch v-model="activeData.__config__.addDisable" />
+          </el-form-item>
+          <el-form-item label="是否禁止明细删除">
+            <el-switch v-model="activeData.__config__.delDisable" />
+          </el-form-item>
+           <el-form-item label="是否禁止明细编辑" v-if="activeData.__config__.mode=='pop'">
+            <el-switch v-model="activeData.__config__.editDisable" />
           </el-form-item>
         </el-form>
       </el-scrollbar>
