@@ -1,4 +1,4 @@
-// 表单属性【右面板】
+// 新建表单 表单属性【右面板】
 export const formConf = {
   // formRef: 'elForm',
   // formModel: 'formData',
@@ -36,6 +36,61 @@ export const formConf = {
   showAsModule:false,
   syncToWorkFlow:true
 }
+
+// 流程审批 表单属性【右面板】
+export const formFlowConf = {
+  init:"",//初始化时执行，如需带入员工域账号等信息需要在此操作，适合赋初始值操作,注只在表单是新增状态时执行
+  editInit:"",//同init,区别是在表单是修改状态时执行
+  beforeSubmit:'', //字符串函数名称或函数，提交前执行
+  descHtml:"", //放在表单顶部的说明文字
+  showDescPop:false, //是否显示说明弹窗，为true则进入页面时自动弹出
+  // descPopSetting:{ //showDescPop为true是，弹窗的设置信息
+  //     popBtnTitle:"",//关闭弹窗时，显示在界面上按钮的文字，默认为"注意事项"
+  //     title:"", //弹窗标题
+  //     popHeight:"",//弹窗高度，默认400
+  //     //弹窗内容，支持html文本
+  //     content:""
+  // },
+  onlySaveValue:true,
+  // 固定按钮
+  "fixBtns": {
+    "agree": {
+        "type": "agree",
+        "show": true,
+        "title": "同意",
+        "needValid": true,
+        "beforeSubmit": "",
+        "icon":"el-icon-check"
+    },
+    "refuse": {
+        "type": "refuse",
+        "show": true,
+        "title": "驳回",
+        "needValid": true,
+        "beforeSubmit": "",
+        "icon":"el-icon-close"
+    },
+    "transfer": {
+        "type": "transfer",
+        "show": true,
+        "title": "转办",
+        "needValid": true,
+        "beforeSubmit": "",
+        "icon":"el-icon-right"
+    }
+},
+// "customerBtns": [
+//   {
+//       "style": "background-color:green;color:#fff",
+//       "title": "测试",
+//       "type": "test",
+//       "clickFunc": "customerClick",
+//       "icon":""
+//   }
+// ],
+  showAsModule:true,
+}
+
 
 // 输入型组件 【左面板】
 export const inputComponents = [

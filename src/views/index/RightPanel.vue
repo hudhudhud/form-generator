@@ -398,19 +398,6 @@
               @input="$set(activeData, 'max', $event?$event:undefined)"
             />
           </el-form-item>
-          <el-form-item
-            v-if="activeData['icon']!==undefined && activeData.__config__.tag === 'el-button'"
-            label="按钮图标"
-          >
-            <el-input v-model="activeData['icon']" placeholder="请输入按钮图标名称">
-              <el-button slot="append" icon="el-icon-thumb" @click="openIconsDialog('icon')">
-                选择
-              </el-button>
-            </el-input>
-          </el-form-item>
-          <el-form-item v-if="activeData.__config__.tag === 'el-cascader'" label="选项分隔符">
-            <el-input v-model="activeData.separator" placeholder="请输入选项分隔符" />
-          </el-form-item>
           <el-form-item v-if="activeData.accept !== undefined" label="文件类型">
             <el-select
               v-model="activeData.accept"
@@ -481,12 +468,14 @@
           <el-form-item label="初始化函数">
             <el-input v-model="formConf.init" placeholder="请输入初始化函数名称" />
           </el-form-item>
-          <el-form-item label="回写函数">
-            <el-input v-model="formConf.editInit" placeholder="请输入回写函数名称" />
-          </el-form-item>
-          <el-form-item label="提交前校验函数">
-            <el-input v-model="formConf.beforeSubmit" placeholder="请输入提交前校验函数名称" />
-          </el-form-item> 
+          <template v-if="!isFlow">
+            <el-form-item label="回写函数">
+              <el-input v-model="formConf.editInit" placeholder="请输入回写函数名称" />
+            </el-form-item>
+            <el-form-item label="提交前校验函数">
+              <el-input v-model="formConf.beforeSubmit" placeholder="请输入提交前校验函数名称" />
+            </el-form-item>
+          </template>
           <el-form-item label="表单描述(html)">
             <el-input type='textarea' :rows="5" v-model="formConf.descHtml" placeholder="请输入表单描述（表单顶部）" />
           </el-form-item>
@@ -510,6 +499,38 @@
           <el-form-item label="表单只提交value值">
             <el-switch v-model="formConf.onlySaveValue" />
           </el-form-item>
+          <section v-if="isFlow">
+            <el-divider>固定按钮</el-divider>
+            <div v-for="(item, index) in formConf.fixBtns" :key="index" class="reg-item" >
+              <el-form-item label="是否显示">
+                <el-switch v-model="item.show" />
+              </el-form-item>
+              <el-form-item label="按钮名称">
+                <el-input v-model="item.title" placeholder="请输入属性名称" />
+              </el-form-item>
+              <el-form-item label="按钮图标">
+                <!-- <el-input v-model="item.icon" placeholder="按钮图标" /> -->
+                  <el-input v-model="item.icon" placeholder="请输入按钮图标" >
+                    <el-button
+                      slot="append"
+                      icon="el-icon-thumb"
+                      @click="openIconsDialog(item)"
+                    >
+                      选择
+                    </el-button>
+                  </el-input>
+              </el-form-item>
+              <el-form-item label="按钮值" style="margin-bottom:0">
+                {{item.type}}
+              </el-form-item>
+              <el-form-item label="提交时是否需要校验">
+                <el-switch v-model="item.needValid" />
+              </el-form-item>
+              <el-form-item label="点击前事件">
+                <el-input v-model="item.beforeSubmit" placeholder="请输入点击前事件方法名称" />
+              </el-form-item>
+            </div>
+          </section>
           <section>
             <el-divider>自定义按钮</el-divider>
             <div
@@ -523,18 +544,37 @@
               <el-form-item label="按钮名称">
                 <el-input v-model="item.title" placeholder="请输入属性名称" />
               </el-form-item>
+                <el-form-item label="按钮图标">
+                <!-- <el-input v-model="item.icon" placeholder="按钮图标" /> -->
+                  <el-input v-model="item.icon" placeholder="请输入按钮图标" >
+                    <el-button
+                      slot="append"
+                      icon="el-icon-thumb"
+                      @click="openIconsDialog(item)"
+                    >
+                      选择
+                    </el-button>
+                  </el-input>
+              </el-form-item>
               <el-form-item label="按钮值" style="margin-bottom:0">
                 <el-input v-model="item.type" placeholder="请输入属性值" />
               </el-form-item>
-              <el-form-item label="按钮显示场景">
-                <el-checkbox-group v-model="item.showState">
-                  <el-checkbox label="add" value=''>新增时</el-checkbox>
-                  <el-checkbox label="edit" value=''>回写时</el-checkbox>
-                </el-checkbox-group>
-              </el-form-item>
-              <el-form-item label="表单提交时是否需要校验">
-                <el-switch v-model="item.needValid" />
-              </el-form-item>
+              <template v-if="!isFlow">
+                <el-form-item label="按钮显示场景">
+                  <el-checkbox-group v-model="item.showState">
+                    <el-checkbox label="add" value=''>新增时</el-checkbox>
+                    <el-checkbox label="edit" value=''>回写时</el-checkbox>
+                  </el-checkbox-group>
+                </el-form-item>
+                <el-form-item label="表单提交时是否需要校验">
+                  <el-switch v-model="item.needValid" />
+                </el-form-item>
+              </template>
+              <template v-else>
+                <el-form-item label="点击事件">
+                  <el-input v-model="item.clickFunc" placeholder="请输入事件方法名称" />
+                </el-form-item>
+              </template>
               <el-form-item label="按钮样式style">
                 <el-input type='textarea' :row='4' v-model="item.style" placeholder="请输入按钮样式" />
               </el-form-item> 
@@ -611,7 +651,7 @@
     </div>
 
     <treeNode-dialog :visible.sync="dialogVisible" title="添加选项" @commit="addNode" />
-    <icons-dialog :visible.sync="iconsVisible" :current="activeData[currentIconModel]" @select="setIcon" />
+    <icons-dialog :visible.sync="iconsVisible" :current="currentIconModel.icon" @select="setIcon" />
   </div>
 </template>
 
@@ -625,7 +665,6 @@ import {
 } from '@/components/generator/config'
 import { saveFormConf } from '@/utils/db'
 import drawingDefalut from '@/components/generator/drawingDefalut'
-
 
 // 使changeRenderKey在目标组件改变时可用
 const needRerenderList = ['tinymce']
@@ -642,10 +681,13 @@ export default {
       currentNode: null,
       dialogVisible: false,
       iconsVisible: false,
-      currentIconModel: null
+      currentIconModel: {}
     }
   },
   computed: {
+    isFlow(){
+      return this.$route.name=='flow'
+    },
     // documentLink() {
     //   return (
     //     this.activeData.__config__.document
@@ -704,6 +746,13 @@ export default {
     // }
   },
   methods: {
+    setIcon(val) {
+      this.currentIconModel.icon = val
+    },
+    openIconsDialog(item) {
+      this.iconsVisible = true
+      this.currentIconModel = item
+    },
     addReg() {
       if(!Array.isArray(this.activeData.__config__.rules)){
         this.$set(this.activeData.__config__,'rules',[])
@@ -814,13 +863,6 @@ export default {
       this.activeData['show-alpha'] = val.indexOf('a') > -1
       this.activeData.__config__.renderKey = +new Date() // 更新renderKey,重新渲染该组件
     },
-    openIconsDialog(model) {
-      this.iconsVisible = true
-      this.currentIconModel = model
-    },
-    setIcon(val) {
-      this.activeData[this.currentIconModel] = val
-    },
     tagChange(tagIcon) {
       let target = inputComponents.find(item => item.__config__.tagIcon === tagIcon)
       if (!target) target = selectComponents.find(item => item.__config__.tagIcon === tagIcon)
@@ -898,13 +940,24 @@ export default {
       if(!Array.isArray(this.formConf.customerBtns)){
        this.$set(this.formConf,'customerBtns',[])
       }
-      this.formConf.customerBtns.push({
-          "title":"", //按钮标题
-          "type":"", //按钮类型，点击按钮时提交的操作类型
-          "showState":[],//显示场景：add 新增，edit 修改
-          "needValid":false,//表单是否需要校验，默认为false
-          "style":"" //自定义按钮样式
-      })
+      if(!this.isFlow){
+        this.formConf.customerBtns.push({
+            "title":"", //按钮标题
+            "type":"", //按钮类型，点击按钮时提交的操作类型
+            "showState":[],//显示场景：add 新增，edit 修改
+            "needValid":false,//表单是否需要校验，默认为false
+            "style":"" //自定义按钮样式
+        })
+      }
+      else{
+        this.formConf.customerBtns.push({
+            "title":"", //按钮标题
+            "type":"", //按钮类型，点击按钮时提交的操作类型
+            "clickFunc":"",//点击事件
+            "style":"" ,//自定义按钮样式
+            "icon":""
+        })
+      }
     },
     addModuleBtn(){
       // if(!Array.isArray(this.drawList)){

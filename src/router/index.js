@@ -11,6 +11,11 @@ const routes = [
     component: Home
   },
   {
+    path: '/flow',
+    name: 'flow',
+    component: Home//()=>import('@/views/index/HomeFlow.vue')
+  },
+  {
     path: '/parser',
     name: 'parser',
     component: () => import(/* webpackChunkName: "parser-example" */'@/components/parser/example/Index.vue')

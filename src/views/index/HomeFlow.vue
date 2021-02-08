@@ -45,7 +45,7 @@
 
     <div class="center-board">
       <div class="action-bar">
-        <div style='display:inline-block;font-size:13px;margin-right:10px' v-if="!isFlow">同步到流程引擎 <el-switch v-model="formConf.syncToWorkFlow" /></div>
+        <!-- <div style='display:inline-block;font-size:13px;margin-right:10px'>同步到流程引擎 <el-switch v-model="formConf.syncToWorkFlow" /></div> -->
         <el-button class="delete-btn" icon="el-icon-delete" type="text" @click="empty">
           清空
         </el-button>
@@ -70,25 +70,8 @@
               <el-scrollbar class="form-container"  :class="{'show':Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length,}">
                  <div v-if='formConf.descHtml' v-html='formConf.descHtml' class="desc-html">
                 </div>
-                <!-- 整体结构展示 -->
-                <template v-if='!formConf.showAsModule'>   
-                  <draggable class="drawing-board" :list="drawingList" :animation="340" group="componentsGroup">
-                    <draggable-item
-                      v-for="(item, index) in drawingList"
-                      :key="item.renderKey"
-                      :drawing-list="drawingList"
-                      :current-item="item"
-                      :index="index"
-                      :active-id="activeId"
-                      :form-conf="formConf"
-                      @activeItem="activeFormItem($event,index)"
-                      @copyItem="drawingItemCopy"
-                      @deleteItem="drawingItemDelete"
-                    />
-                  </draggable>
-                </template>
                 <!-- 模块结构展示 -->
-                <template v-else>
+                <template>
                   <template v-for='(moduleItem,i) in drawingList'>
                      <el-collapse v-if='moduleItem.module' :key='i' v-model='activeNames'>
                       <el-collapse-item :title="moduleItem.module" :name="moduleItem.module" 
@@ -136,44 +119,33 @@
                     </div>
                     <Popup :setting="formConf.descPopSetting" v-model='showDescPop'/>
                 </template>
-                <!-- 新建表单按钮 -->
-                <div class="btns"  
-                  v-if='!isFlow&&Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length'
-                  :class="{'no-space':Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length>2}">
-                    <el-button type="primary">提交</el-button>
-                    <template v-for='(btn,i) of formConf.customerBtns' >
-                        <el-button type="primary" plain  :style='btn.style' :key='i'>{{btn.title}} </el-button> 
-                    </template>
-                    <el-button type="default">返回</el-button>
-                </div> 
-                <!-- 流程审批按钮 -->
-                <div class="btns" v-if="isFlow" :class="{'no-space':Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length>2}">
-                  <!-- 同意 -->
-                  <template v-if="formConf.fixBtns&&formConf.fixBtns.agree">
-                      <el-button type="primary"  v-if="formConf.fixBtns.agree.show" :icon="formConf.fixBtns.agree.icon" >
-                          {{formConf.fixBtns.agree.title}}
-                      </el-button>
-                  </template>
-                  <el-button type="primary" v-else icon="el-icon-check" >同意</el-button>
-                  <!-- 驳回 -->
-                  <template v-if="formConf.fixBtns&&formConf.fixBtns.refuse">
-                      <el-button type="primary" v-if="formConf.fixBtns.refuse.show"  :icon="formConf.fixBtns.refuse.icon">
-                          {{formConf.fixBtns.refuse.title}}
-                      </el-button>
-                  </template>
-                  <el-button type="primary"  v-else icon="el-icon-close">驳回</el-button>
-                  <!-- 转办 -->
-                  <template v-if="formConf.fixBtns&&formConf.fixBtns.transfer">
-                      <el-button type="primary"  v-if="formConf.fixBtns.transfer.show" :icon="formConf.fixBtns.transfer.icon">
-                          {{formConf.fixBtns.transfer.title}}
-                      </el-button>
-                  </template>
-                  <el-button type="primary" v-else icon="el-icon-right">转办</el-button>
-                  <!-- 自定义按钮 -->
-                  <template v-for='(btn,i) of formConf.customerBtns' >
-                      <el-button type="primary" plain  :style='btn.style' :key='i' :icon="btn.icon">{{btn.title}} </el-button> 
-                  </template>
-                </div> 
+                <div class="btns" :class="{'no-space':Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length>2}">
+                 <!-- 同意 -->
+                <template v-if="formConf.fixBtns.agree">
+                    <el-button type="primary"  v-if="formConf.fixBtns.agree.show" :icon="formConf.fixBtns.agree.icon" >
+                        {{formConf.fixBtns.agree.title}}
+                    </el-button>
+                </template>
+                <el-button type="primary" v-else icon="el-icon-check" >同意</el-button>
+                <!-- 驳回 -->
+                <template v-if="formConf.fixBtns.refuse">
+                    <el-button type="primary" v-if="formConf.fixBtns.refuse.show"  :icon="formConf.fixBtns.refuse.icon">
+                        {{formConf.fixBtns.refuse.title}}
+                    </el-button>
+                </template>
+                <el-button type="primary"  v-else icon="el-icon-close">驳回</el-button>
+                <!-- 转办 -->
+                <template v-if="formConf.fixBtns.transfer">
+                    <el-button type="primary"  v-if="formConf.fixBtns.transfer.show" :icon="formConf.fixBtns.transfer.icon">
+                        {{formConf.fixBtns.transfer.title}}
+                    </el-button>
+                </template>
+                <el-button type="primary" v-else icon="el-icon-right">转办</el-button>
+                <!-- 自定义按钮 -->
+                <template v-for='(btn,i) of formConf.customerBtns' >
+                    <el-button type="primary" plain  :style='btn.style' :key='i' :icon="btn.icon">{{btn.title}} </el-button> 
+                </template>
+              </div> 
               </el-scrollbar>
             </el-form>
           </el-row>
@@ -222,7 +194,7 @@ import FormDrawer from './FormDrawer'
 import JsonDrawer from './JsonDrawer'
 import RightPanel from './RightPanel'
 import {
-  inputComponents, selectComponents,otherComponents, detailComponents,formConf,formFlowConf
+  inputComponents, selectComponents,otherComponents, detailComponents,formFlowConf
 } from '@/components/generator/config'
 import {
   exportDefault, beautifierConf, isNumberStr, titleCase, deepClone
@@ -272,7 +244,7 @@ export default {
       showDescPop:false,
       logo,
       idGlobal,
-      formConf:this.isFlow?formFlowConf:formConf,
+      formConf:formFlowConf,
       inputComponents,
       selectComponents,
       otherComponents,
@@ -317,9 +289,6 @@ export default {
     }
   },
   computed: {
-    isFlow(){
-      return this.$route.name=='flow'
-    },
     activeNames: {
       get: function() {
         let res = []
@@ -562,7 +531,6 @@ export default {
       return {__config__:{...param},...obj}
     },
     activeFormItem(currentItem,index) {
-      if(!currentItem)return
       this.activeData = currentItem
       this.activeId = currentItem.__config__.formId
     },
@@ -914,9 +882,6 @@ export default {
       }
       ::v-deep.active-from-item{
         border: 1px dashed red !important;//$lighterBlue;
-      }
-      ::v-deep.el-scrollbar__view{
-        height:100%;
       }
     }
     .desc-html{
