@@ -34,14 +34,13 @@ export const formConf = {
   //     // }        
   // ]
   showAsModule:false,
-  syncToWorkFlow:true
+  // syncToWorkFlow:true
 }
 
 // 流程审批 表单属性【右面板】
 export const formFlowConf = {
   init:"",//初始化时执行，如需带入员工域账号等信息需要在此操作，适合赋初始值操作,注只在表单是新增状态时执行
   editInit:"",//同init,区别是在表单是修改状态时执行
-  beforeSubmit:'', //字符串函数名称或函数，提交前执行
   descHtml:"", //放在表单顶部的说明文字
   showDescPop:false, //是否显示说明弹窗，为true则进入页面时自动弹出
   // descPopSetting:{ //showDescPop为true是，弹窗的设置信息

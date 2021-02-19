@@ -45,7 +45,7 @@
 
     <div class="center-board">
       <div class="action-bar">
-        <div style='display:inline-block;font-size:13px;margin-right:10px' v-if="!isFlow">同步到流程引擎 <el-switch v-model="formConf.syncToWorkFlow" /></div>
+        <!-- <div style='display:inline-block;font-size:13px;margin-right:10px' v-if="!isFlow">同步到流程引擎 <el-switch v-model="formConf.syncToWorkFlow" /></div> -->
         <el-button class="delete-btn" icon="el-icon-delete" type="text" @click="empty">
           清空
         </el-button>
@@ -505,6 +505,12 @@ export default {
             this.$set(this.formConf,key,this.initDrawing[key])
           }
         })
+        //移除删除的json字段
+        Object.keys(this.formConf).forEach((key,i)=>{
+          if(!(key in this.initDrawing)){
+            delete this.formConf[key]
+          }
+        })
       }
     // }
     loadBeautifier(btf => {
@@ -748,11 +754,11 @@ export default {
       // window.parent.parentSetJson(beautifierJson); 
       // window.parent.postMessage(beautifierJson, '*')
       //构造流程引擎json
-      let readJson = ''
-      if(this.formConf.syncToWorkFlow){
-        readJson =  this.buildReadJson(beautifierJson)
-        //return 
-      }
+      // let readJson = ''
+      // if(this.formConf.syncToWorkFlow){
+      //   readJson =  this.buildReadJson(beautifierJson)
+      //   //return 
+      // }
       if(!this.$route.query.orunid){
         Toast({ message:'保存失败，缺少orunid参数！', position:'middle', duration:3000 })
         return
@@ -760,7 +766,7 @@ export default {
 
       try{
           let res =  await Request.post(SAVE_JSON,{orunid:this.$route.query.orunid,
-          formJson:beautifierJson,readJson,systemid:this.systemid,css:beautifierCss,js:beautifierJs})
+          formJson:beautifierJson,systemid:this.systemid,css:beautifierCss,js:beautifierJs})
           if(res.code==0){
             this.$message({ message: '保存成功！', type: 'success' });
           }
