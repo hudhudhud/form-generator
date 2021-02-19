@@ -686,7 +686,38 @@ export default {
   },
   computed: {
     isFlow(){
-      return this.$route.name=='flow'
+      let res = this.$route.name=='flow'
+      if(res){
+        if(!this.formConf.fixBtns){
+          this.$set(this.formConf,'fixBtns',{
+            "agree": {
+                "type": "agree",
+                "show": true,
+                "title": "同意",
+                "needValid": true,
+                "beforeSubmit": "",
+                "icon":"el-icon-check"
+            },
+            "refuse": {
+                "type": "refuse",
+                "show": true,
+                "title": "驳回",
+                "needValid": true,
+                "beforeSubmit": "",
+                "icon":"el-icon-close"
+            },
+            "transfer": {
+                "type": "transfer",
+                "show": true,
+                "title": "转办",
+                "needValid": true,
+                "beforeSubmit": "",
+                "icon":"el-icon-right"
+            }
+          })
+        }
+      }
+      return res
     },
     // documentLink() {
     //   return (
