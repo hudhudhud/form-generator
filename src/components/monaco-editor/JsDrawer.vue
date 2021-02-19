@@ -8,18 +8,14 @@
         </span> -->
         <span ref="copyBtn" class="bar-btn copy-json-btn">
           <i class="el-icon-document-copy" />
-          复制JSON
+          复制js
         </span>
-        <!-- <span class="bar-btn" @click="exportJsonFile">
-          <i class="el-icon-download" />
-          导出JSON文件
-        </span> -->
         <span class="bar-btn delete-btn" @click="$emit('update:visible', false)">
           <i class="el-icon-circle-close" />
           关闭
         </span>
       </div>
-      <div id="editorJson" class="json-editor" />
+      <div id="editorJs" class="json-editor" />
     </el-drawer>
   </div>
 </template>
@@ -37,16 +33,26 @@ let monaco
 export default {
   components: {},
   props: {
-    jsonStr: {
-      type: String,
-      required: true
-    }
+    value:''
   },
   data() {
-    return {}
+    return {
+      jsStr:''
+    }
   },
-  computed: {},
-  watch: {},
+  watch: {
+    value:{
+        handler(v){
+            this.jsStr = v
+        },
+        immediate:true,
+    },
+    jsStr:{
+        handler(v){
+            this.$emit('input',v)
+        },
+    }
+  },
   created() {},
   mounted() {
     window.addEventListener('keydown', this.preventDefaultSave)
@@ -76,53 +82,34 @@ export default {
     onOpen() {
       loadBeautifier(btf => {
         beautifier = btf
-        this.beautifierJson = beautifier.js(this.jsonStr, beautifierConf.js)
+        this.beautifierJson = beautifier.js(this.jsStr, beautifierConf.js)
 
         loadMonaco(val => {
           monaco = val
-          this.setEditorValue('editorJson', this.beautifierJson)
+          this.setEditorValue('editorJs', this.beautifierJson)
         })
       })
     },
     onClose() {},
     setEditorValue(id, codeStr) {
-      if (this.jsonEditor) {
-        this.jsonEditor.setValue(codeStr)
+      if (this.jsEditor) {
+        this.jsEditor.setValue(codeStr)
       } else {
-        this.jsonEditor = monaco.editor.create(document.getElementById(id), {
+        this.jsEditor = monaco.editor.create(document.getElementById(id), {
           value: codeStr,
           theme: 'vs-dark',
-          language: 'json',
+          language: 'javascript',
           automaticLayout: true
         })
+        //用户手动输入
+        this.jsEditor.onDidChangeModelContent((event) => {
+          this.jsStr = this.jsEditor.getValue();
+        })
         // ctrl + s 刷新
-        this.jsonEditor.onKeyDown(e => {
+        this.jsEditor.onKeyDown(e => {
           if (e.keyCode === 49 && (e.metaKey || e.ctrlKey)) {
             this.refresh()
           }
-        })
-      }
-    },
-    exportJsonFile() {
-      this.$prompt('文件名:', '导出文件', {
-        inputValue: `${+new Date()}.json`,
-        closeOnClickModal: false,
-        inputPlaceholder: '请输入文件名'
-      }).then(({ value }) => {
-        if (!value) value = `${+new Date()}.json`
-        const codeStr = this.jsonEditor.getValue()
-        const blob = new Blob([codeStr], { type: 'text/plain;charset=utf-8' })
-        saveAs(blob, value)
-      })
-    },
-    refresh() {
-      try {
-        this.$emit('refresh', JSON.parse(this.jsonEditor.getValue()))
-      } catch (error) {
-        this.$notify({
-          title: '错误',
-          message: 'JSON格式错误，请检查',
-          type: 'error'
         })
       }
     }

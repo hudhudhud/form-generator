@@ -659,7 +659,7 @@
 import { isArray } from 'util'
 import TreeNodeDialog from '@/views/index/TreeNodeDialog'
 import { isNumberStr } from '@/utils/index'
-import IconsDialog from './IconsDialog'
+import IconsDialog from '@/components/IconsDialog'
 import {
   inputComponents, selectComponents
 } from '@/components/generator/config'

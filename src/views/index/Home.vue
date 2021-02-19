@@ -52,6 +52,12 @@
         <el-button icon="el-icon-check" type="text" @click="confirmJson">
           保存
         </el-button>
+        <el-button icon="el-icon-view" type="text" @click="showCss">
+          查看css
+        </el-button>
+        <el-button icon="el-icon-view" type="text" @click="showJs">
+         查看js
+        </el-button>
         <el-button icon="el-icon-view" type="text" @click="showJson">
           查看json
         </el-button>
@@ -190,24 +196,24 @@
       @tag-change="tagChange"
     />
 
-    <form-drawer
-      :visible.sync="drawerVisible"
-      :form-data="formData"
-      size="100%"
-      :generate-conf="generateConf"
+    <css-drawer
+      size="60%"
+      v-model="cssData"
+      :visible.sync="cssDrawerVisible"
+    />
+    <js-drawer
+      size="60%"
+      v-model="jsData"
+      :visible.sync="jsDrawerVisible"
     />
     <json-drawer
       size="60%"
       :visible.sync="jsonDrawerVisible"
       :json-str="JSON.stringify(formData)"
       @refresh="refreshJson"
+      @jsonChange = "jsonChange"
     />
-    <code-type-dialog
-      :visible.sync="dialogVisible"
-      title="选择生成类型"
-      :show-file-name="showFileName"
-      @confirm="generate"
-    />
+   
     <input id="copyNode" type="hidden">
   </div>
 </template>
@@ -218,8 +224,9 @@ import { debounce } from 'throttle-debounce'
 import { saveAs } from 'file-saver'
 import ClipboardJS from 'clipboard'
 import render from '@/components/render/render'
-import FormDrawer from './FormDrawer'
-import JsonDrawer from './JsonDrawer'
+import JsonDrawer from '@/components/monaco-editor/JsonDrawer'
+import JsDrawer from '@/components/monaco-editor/JsDrawer'
+import CssDrawer from '@/components/monaco-editor/CssDrawer'
 import RightPanel from './RightPanel'
 import {
   inputComponents, selectComponents,otherComponents, detailComponents,formConf,formFlowConf
@@ -235,7 +242,6 @@ import { makeUpCss } from '@/components/generator/css'
 import drawingDefalut from '@/components/generator/drawingDefalut'
 import initDrawing from '@/components/generator/initDrawing'
 import logo from '@/assets/logo.png'
-import CodeTypeDialog from './CodeTypeDialog'
 import DraggableItem from './DraggableItem'
 import {
   getDrawingList, saveDrawingList, getIdGlobal, saveIdGlobal, getFormConf
@@ -257,15 +263,17 @@ export default {
   components: {
     draggable,
     render,
-    FormDrawer,
     JsonDrawer,
+    JsDrawer,
+    CssDrawer,
     RightPanel,
-    CodeTypeDialog,
     DraggableItem,
     Popup
   },
   data() {
     return {
+      jsData:'',
+      cssData:'',
       systemid:'',
       activeModuleIndex:0,
       initDrawing:initDrawing,
@@ -286,6 +294,8 @@ export default {
       formData: {},
       dialogVisible: false,
       jsonDrawerVisible: false,
+      jsDrawerVisible:false,
+      cssDrawerVisible:false,
       generateConf: null,
       showFileName: false,
       activeData: {},//drawingDefalut[0],
@@ -381,6 +391,8 @@ export default {
         try{
           let res =  await Request.post(GET_JSON,{orunid:this.$route.query.orunid})
           this.initDrawing = res.htmlJson
+          this.cssData = res.css
+          this.jsData = res.js
           this.systemid = res.systemid
           if(this.initDrawing.modules){
             this.$set(this.formConf,"showAsModule",true)
@@ -398,6 +410,11 @@ export default {
             })
         }
       }
+
+    this.initJsonData()
+  },
+  methods: {
+    initJsonData(){
       if(this.initDrawing){
         if(Array.isArray(this.initDrawing['params'])){
           this.initDrawing['params'].forEach((param,i)=>{
@@ -493,22 +510,7 @@ export default {
     loadBeautifier(btf => {
       beautifier = btf
     })
-    const clipboard = new ClipboardJS('#copyNode', {
-      text: trigger => {
-        const codeStr = this.generateCode()
-        this.$notify({
-          title: '成功',
-          message: '代码已复制到剪切板，可粘贴。',
-          type: 'success'
-        })
-        return codeStr
-      }
-    })
-    clipboard.on('error', e => {
-      this.$message.error('代码复制失败')
-    })
-  },
-  methods: {
+    },
     settingInitJson(param){
       let obj = {}
       if(param.show===undefined){
@@ -692,9 +694,6 @@ export default {
       const blob = new Blob([codeStr], { type: 'text/plain;charset=utf-8' })
       saveAs(blob, data.fileName)
     },
-    execCopy(data) {
-      document.getElementById('copyNode').click()
-    },
     empty() {
       this.$confirm('确定要清空所有组件吗？', '提示', { type: 'warning' }).then(
         () => {
@@ -733,10 +732,18 @@ export default {
       this.AssembleFormData()
       this.jsonDrawerVisible = true
     },
+    showJs(){
+      this.jsDrawerVisible = true
+    },
+    showCss(){
+      this.cssDrawerVisible = true
+    },
     async confirmJson(){
       this.AssembleFormData()
       let jsonString = JSON.stringify(this.formData)
       let beautifierJson = beautifier.js(jsonString, beautifierConf.js)
+      let beautifierCss =  beautifier.js(this.cssData, beautifierConf.js)
+      let beautifierJs =  beautifier.js(this.jsData, beautifierConf.js)
       console.log('formJson...',beautifierJson)
       // window.parent.parentSetJson(beautifierJson); 
       // window.parent.postMessage(beautifierJson, '*')
@@ -753,7 +760,7 @@ export default {
 
       try{
           let res =  await Request.post(SAVE_JSON,{orunid:this.$route.query.orunid,
-          formJson:beautifierJson,readJson,systemid:this.systemid})
+          formJson:beautifierJson,readJson,systemid:this.systemid,css:beautifierCss,js:beautifierJs})
           if(res.code==0){
             this.$message({ message: '保存成功！', type: 'success' });
           }
@@ -868,6 +875,12 @@ export default {
       //   delete data.modules
       //   this.formConf = data
       // }
+    },
+    jsonChange(newjson){
+      // console.log('jsonChange',newjson)
+      this.drawingList = []
+      this.initDrawing = newjson 
+      this.initJsonData()
     }
   }
 }
