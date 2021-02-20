@@ -4,7 +4,7 @@
         <span class="cell-text">{{item.label}}</span>
     </div>
     <div class="cell-value">
-        <p class='p-only-show'>{{txt}}</p>
+        <p class='p-only-show' :data-key='item.key'>{{txt}}</p>
     </div>
 </section>
 </template>

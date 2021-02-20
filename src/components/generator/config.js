@@ -54,15 +54,15 @@ export const formFlowConf = {
   // 固定按钮
   "fixBtns": {
     "agree": {
-        "type": "agree",
+        "type": "Agree",
         "show": true,
         "title": "同意",
         "needValid": true,
         "beforeSubmit": "",
         "icon":"el-icon-check"
     },
-    "refuse": {
-        "type": "refuse",
+    "reject": {
+        "type": "Reject",
         "show": true,
         "title": "驳回",
         "needValid": true,
@@ -70,7 +70,7 @@ export const formFlowConf = {
         "icon":"el-icon-close"
     },
     "transfer": {
-        "type": "transfer",
+        "type": "Transfer",
         "show": true,
         "title": "转办",
         "needValid": true,
@@ -147,6 +147,15 @@ export const inputComponents = [
       "callback":""
     },
     settingAutoSize:false
+  },
+  {
+    __config__: {
+        "type":"label",//必填，组件类型
+        "value":"",
+        "key":"",      //必填，字段名称
+        "label":"label显示组件" ,
+        "show":true,//是否显示，默认为true,
+    },
   },
 ]
 
@@ -339,15 +348,6 @@ export const selectComponents = [
 
 
 export const otherComponents =[
-  {
-    __config__: {
-        "type":"label",//必填，组件类型
-        "value":"",
-        "key":"",      //必填，字段名称
-        "label":"label显示组件" ,
-        "show":true,//是否显示，默认为true,
-    },
-  },
   {
     __config__: {
         "type":"fileUpload",//必填，组件类型

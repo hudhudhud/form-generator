@@ -4,6 +4,9 @@
     <div class="left-board">
       <div class="logo-wrapper">
         <div class="logo">
+          <el-button icon="el-icon-view" type="text" @click="goPreview">
+            预览（测试环境）
+          </el-button>
         </div>
       </div>
       <el-scrollbar class="left-scrollbar">
@@ -73,7 +76,7 @@
               :disabled="formConf.disabled"
               :label-width="formConf.labelWidth + 'px'"
             > 
-              <el-scrollbar class="form-container"  :class="{'show':Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length,}">
+              <el-scrollbar class="form-container"  :class="{'show':(Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length)||isFlow,}">
                  <div v-if='formConf.descHtml' v-html='formConf.descHtml' class="desc-html">
                 </div>
                 <!-- 整体结构展示 -->
@@ -240,6 +243,7 @@ import {
 import { makeUpJs } from '@/components/generator/js'
 import { makeUpCss } from '@/components/generator/css'
 import drawingDefalut from '@/components/generator/drawingDefalut'
+import {drawingDefalutFlow} from '@/components/generator/drawingDefalut'
 import initDrawing from '@/components/generator/initDrawing'
 import logo from '@/assets/logo.png'
 import DraggableItem from './DraggableItem'
@@ -415,7 +419,11 @@ export default {
   },
   methods: {
     initJsonData(){
-      if(this.initDrawing){
+      //流程配置默认
+      if(this.isFlow&&(!this.initDrawing||!Object.keys(this.initDrawing).length)){
+        this.initDrawing = drawingDefalutFlow
+      }
+      if(this.initDrawing&&Object.keys(this.initDrawing).length){
         if(Array.isArray(this.initDrawing['params'])){
           this.initDrawing['params'].forEach((param,i)=>{
             if(param.type!=='detail'){
@@ -476,30 +484,7 @@ export default {
             this.drawingList.push({module:moduleItem.module,active:moduleItem.active,class:moduleItem.class,params:paramsList})
           })
         }
-      }
-      else{
-        this.drawingList = drawingDefalut
-        this.activeId=100
-      }
-    // }
-  
-    this.drawingListObj={list:this.drawingList}
-    if(!this.formConf.showAsModule){
-      this.activeFormItem(this.drawingList[0])
-    }
-    else{
-      this.activeModuleIndex=0
-      if(this.drawingList.length&&this.drawingList[0].params.length){
-        this.activeFormItem(this.drawingList[0].params[0])
-      }
-    }
-    
-
-    // if (formConfInDB) {
-    //   this.formConf = formConfInDB
-    // }
-    // else {
-      if(this.initDrawing){
+        
         Object.keys(this.initDrawing).forEach((key,i)=>{
           if(key!=='params'&&key!=='modules'){
             this.$set(this.formConf,key,this.initDrawing[key])
@@ -512,7 +497,24 @@ export default {
           }
         })
       }
-    // }
+      else{
+        //新建配置默认
+        this.drawingList = drawingDefalut
+        this.activeId=100
+      }
+
+      this.drawingListObj={list:this.drawingList}
+
+      //默认选中第一项
+      if(!this.formConf.showAsModule){
+        this.activeFormItem(this.drawingList[0])
+      }
+      else{
+        this.activeModuleIndex=0
+        if(this.drawingList.length&&this.drawingList[0].params.length){
+          this.activeFormItem(this.drawingList[0].params[0])
+        }
+      }
     loadBeautifier(btf => {
       beautifier = btf
     })
@@ -887,6 +889,17 @@ export default {
       this.drawingList = []
       this.initDrawing = newjson 
       this.initJsonData()
+    },
+    goPreview(){
+      let a = document.createElement('a')
+      a.setAttribute('target','_blank')
+      if(this.isFlow){
+        a.href = "http://mobileproxy.h3c.com:8000/dev/work-flow/#/workflow-detail-form?orunid="+this.$route.query.orunid
+      }
+      else{
+        a.href = "http://mobileproxy.h3c.com:8000/dev/work-flow/#/workflow-form/"+this.$route.query.orunid
+      }
+      a.click()
     }
   }
 }

@@ -5,6 +5,14 @@
       <el-tab-pane label="表单属性" name="form" />
     </el-tabs>
     <div class="field-box" v-if='activeData&&activeData.__config__'>
+      <a
+        class="document-link"
+        target="_blank"
+        :href="`http://mobileproxy.h3c.com:8000/dev/work-flow/formConfigDoc.html#${activeData.__config__.type}`"
+        title="查看组件文档"
+      >
+        <i class="el-icon-link" />
+      </a>
       <el-scrollbar class="right-scrollbar">
         <!-- 组件属性 -->
         <el-form v-show="currentTab==='field' && showField &&activeData.__config__.type!='detail'" size="small" label-width="150px">
@@ -690,16 +698,16 @@ export default {
       if(res){
         if(!this.formConf.fixBtns){
           this.$set(this.formConf,'fixBtns',{
-            "agree": {
-                "type": "agree",
+           "agree": {
+                "type": "Agree",
                 "show": true,
                 "title": "同意",
                 "needValid": true,
                 "beforeSubmit": "",
                 "icon":"el-icon-check"
             },
-            "refuse": {
-                "type": "refuse",
+            "reject": {
+                "type": "Reject",
                 "show": true,
                 "title": "驳回",
                 "needValid": true,
@@ -707,7 +715,7 @@ export default {
                 "icon":"el-icon-close"
             },
             "transfer": {
-                "type": "transfer",
+                "type": "Transfer",
                 "show": true,
                 "title": "转办",
                 "needValid": true,
