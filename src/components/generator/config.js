@@ -65,7 +65,7 @@ export const formFlowConf = {
         "type": "Reject",
         "show": true,
         "title": "驳回",
-        "needValid": true,
+        "needValid": false,
         "beforeSubmit": "",
         "icon":"el-icon-close"
     },
@@ -73,7 +73,7 @@ export const formFlowConf = {
         "type": "Transfer",
         "show": true,
         "title": "转办",
-        "needValid": true,
+        "needValid": false,
         "beforeSubmit": "",
         "icon":"el-icon-right"
     }
