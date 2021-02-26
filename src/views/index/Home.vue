@@ -750,7 +750,7 @@ export default {
       this.AssembleFormData()
       let jsonString = JSON.stringify(this.formData)
       let beautifierJson = beautifier.js(jsonString, beautifierConf.js)
-      let beautifierCss =  beautifier.js(this.cssData, beautifierConf.js)
+      let beautifierCss = this.cssData// beautifier.js(this.cssData, beautifierConf.js)
       let beautifierJs =  beautifier.js(this.jsData, beautifierConf.js)
       console.log('formJson...',beautifierJson)
       // window.parent.parentSetJson(beautifierJson); 

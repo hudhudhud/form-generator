@@ -28,11 +28,12 @@
 import { beautifierConf } from '@/utils/index'
 import ClipboardJS from 'clipboard'
 import { saveAs } from 'file-saver'
-import loadMonaco from '@/utils/loadMonaco'
+// import loadMonaco from '@/utils/loadMonaco'
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 import loadBeautifier from '@/utils/loadBeautifier'
 import { debounce } from 'throttle-debounce'
 let beautifier
-let monaco
+// let monaco
 
 export default {
   components: {},
@@ -78,10 +79,10 @@ export default {
         beautifier = btf
         this.beautifierJson = beautifier.js(this.jsonStr, beautifierConf.js)
 
-        loadMonaco(val => {
-          monaco = val
+        // loadMonaco(val => {
+        //   monaco = val
           this.setEditorValue('editorJson', this.beautifierJson)
-        })
+        // })
       })
     },
     onClose() {},

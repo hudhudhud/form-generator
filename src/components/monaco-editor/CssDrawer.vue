@@ -24,11 +24,13 @@
 import { beautifierConf } from '@/utils/index'
 import ClipboardJS from 'clipboard'
 import { saveAs } from 'file-saver'
-import loadMonaco from '@/utils/loadMonaco'
+// import loadMonaco from '@/utils/loadMonaco'
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
+import 'monaco-editor/esm/vs/basic-languages/css/css.contribution';
 import loadBeautifier from '@/utils/loadBeautifier'
 
 let beautifier
-let monaco
+// let monaco
 
 export default {
   components: {},
@@ -81,15 +83,15 @@ export default {
       }
     },
     onOpen() {
-      loadBeautifier(btf => {
-        beautifier = btf
-        this.beautifierJson = beautifier.js(this.cssStr, beautifierConf.js)
+      // loadBeautifier(btf => {
+      //   beautifier = btf
+        // this.beautifierJson = beautifier.js(this.cssStr, beautifierConf.js)
 
-        loadMonaco(val => {
-          monaco = val
-          this.setEditorValue('editorCss', this.beautifierJson)
-        })
-      })
+        // loadMonaco(val => {
+        //   monaco = val
+          this.setEditorValue('editorCss', this.cssStr)
+        // })
+      // })
     },
     onClose() {},
     setEditorValue(id, codeStr) {
