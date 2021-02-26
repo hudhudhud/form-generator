@@ -19,17 +19,10 @@ module.exports = {
   publicPath: '',
   pages: {
     index: {
-      entry: 'src/views/index/main.js',
+      entry: 'src/main.js',
       template: 'public/index.html',
       filename: 'index.html',
       chunks: ['chunk-vendors', 'chunk-common', 'index'],
-      minify
-    },
-    preview: {
-      entry: 'src/views/preview/main.js',
-      template: 'public/preview.html',
-      filename: 'preview.html',
-      chunks: ['chunk-vendors', 'chunk-common', 'preview'],
       minify
     }
   },
@@ -37,14 +30,14 @@ module.exports = {
     overlay: false
   },
   productionSourceMap: false,
-  configureWebpack: {
-    externals: {
-      vue: 'Vue',
-      'vue-router': 'VueRouter',
-      axios: 'axios',
-      'element-ui': 'ELEMENT'
-    }
-  },
+  // configureWebpack: {
+  //   externals: {
+  //     vue: 'Vue',
+  //     'vue-router': 'VueRouter',
+  //     axios: 'axios',
+  //     'element-ui': 'ELEMENT'
+  //   }
+  // },
   chainWebpack(config) {
     // set svg-sprite-loader
     config.module

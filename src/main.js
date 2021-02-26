@@ -7,6 +7,9 @@ import Tinymce from '@/components/tinymce/index.vue'
 import 'mint-ui/lib/style.css'
 import 'font-awesome/css/font-awesome.min.css'
 import FormComponents from '@/components/form-design/form-components'
+// import 'element-ui/lib/theme-chalk/index.css';
+import ElementUI from 'element-ui'
+Vue.use(ElementUI)
 // import axios from 'axios'
 Vue.component('tinymce', Tinymce)
 
