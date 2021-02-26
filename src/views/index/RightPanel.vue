@@ -664,6 +664,7 @@
 </template>
 
 <script>
+import draggable from 'vuedraggable'
 import { isArray } from 'util'
 import TreeNodeDialog from '@/views/index/TreeNodeDialog'
 import { isNumberStr } from '@/utils/index'
@@ -680,7 +681,8 @@ const needRerenderList = ['tinymce']
 export default {
   components: {
     TreeNodeDialog,
-    IconsDialog
+    IconsDialog,
+    draggable
   },
   props: ['showField', 'activeData', 'formConf','drawListObj'],
   data() {
