@@ -1,6 +1,7 @@
 <template>
     <mt-popup v-model="popupVisible" position="bottom" :closeOnClickModal='false' :modal='false'>
         <div class="search-content" >
+            <p style='font-size:14px;color:red'>样例数据，实际数据需要自行配置</p>
             <el-scrollbar class="list" :class='{chooseMutiple:chooseMutiple}'>
                 <template v-if='chooseMutiple'>
                     <div v-for='(it,i) of list'  :key='i' class="item">
