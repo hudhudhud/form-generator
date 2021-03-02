@@ -638,6 +638,10 @@
           <el-form-item label="明细标题" >
             <el-input v-model="activeData.__config__.title" placeholder="请输入标题" />
           </el-form-item>
+          <el-form-item label='明细项标题' v-if="activeData.__config__.mode!=='simple'">
+            <el-input v-model="activeData.__config__.detailTitle"  placeholder="请输入明细项标题" />
+            <span style="font-size:12px;color:#ED5E1D;">如"明细{i}"，“{i}”为明细项序号占位符，默认为明细标题加序号</span>
+          </el-form-item>
           <!-- 默认值 -->
           <!-- <el-form-item  label="默认值" v-if='activeData.__config__.type=="checkbox"'>
             <el-switch v-model="activeData.__config__.value" />
