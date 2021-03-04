@@ -148,15 +148,6 @@ export const inputComponents = [
     },
     settingAutoSize:false
   },
-  {
-    __config__: {
-        "type":"label",//必填，组件类型
-        "value":"",
-        "key":"",      //必填，字段名称
-        "label":"label显示组件" ,
-        "show":true,//是否显示，默认为true,
-    },
-  },
 ]
 
 export const selectComponents = [
@@ -346,6 +337,26 @@ export const selectComponents = [
   }
 ]
 
+export const showComponets = [
+  {
+    __config__: {
+        "type":"label",//必填，组件类型
+        "value":"",
+        "key":"",      //必填，字段名称
+        "label":"label显示组件" ,
+        "show":true,//是否显示，默认为true,
+    },
+  },
+  {
+    __config__:{
+      "type":"html", //必填，组件类型
+      "key":"", //必填，字段名称；且为input元素上data-key属性值，获取值方法$("input[data-key='hidden-name']").val()
+      "label":"html备注组件",
+      "value":"html备注组件",//非必填，默认值
+      "show":true,
+    },
+  }
+]
 
 export const otherComponents =[
   {
@@ -388,13 +399,11 @@ export const otherComponents =[
   },
   {
     __config__:{
-      "type":"html", //必填，组件类型
-      "key":"", //必填，字段名称；且为input元素上data-key属性值，获取值方法$("input[data-key='hidden-name']").val()
-      "label":"html备注组件",
-      "value":"html备注组件",//非必填，默认值
-      "show":true,
+      "type":"reference", //必填，组件类型
+      "label":"引用组件",
+      "referId":""//必填
     },
-  }
+  },
 ]
 
 export const detailComponents =[

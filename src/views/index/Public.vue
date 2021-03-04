@@ -4,9 +4,9 @@
     <div class="left-board">
       <div class="logo-wrapper">
         <div class="logo">
-          <el-button icon="el-icon-view" type="text" @click="goPreview">
+          <!-- <el-button icon="el-icon-view" type="text" @click="goPreview">
             预览（测试环境）
-          </el-button>
+          </el-button> -->
         </div>
       </div>
       <el-scrollbar class="left-scrollbar">
@@ -47,9 +47,7 @@
     </div>
 
     <div class="center-board">
-      <div class="action-bar">
-        <!-- <div style='display:inline-block;font-size:13px;margin-right:10px' v-if="!isFlow">同步到流程引擎 <el-switch v-model="formConf.syncToWorkFlow" /></div> -->
-        <el-button class="delete-btn" icon="el-icon-delete" type="text" @click="empty">
+      <div class="action-bar"> <el-button class="delete-btn" icon="el-icon-delete" type="text" @click="empty">
           清空
         </el-button>
         <el-button icon="el-icon-check" type="text" @click="confirmJson">
@@ -76,11 +74,9 @@
               :disabled="formConf.disabled"
               :label-width="formConf.labelWidth + 'px'"
             > 
-              <el-scrollbar class="form-container"  :class="{'show':(Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length)||isFlow,}">
-                 <div v-if='formConf.descHtml' v-html='formConf.descHtml' class="desc-html">
-                </div>
+              <el-scrollbar class="form-container">
                 <!-- 整体结构展示 -->
-                <template v-if='!formConf.showAsModule'>   
+                <template>   
                   <draggable class="drawing-board" :list="drawingList" :animation="340" group="componentsGroup">
                     <draggable-item
                       v-for="(item, index) in drawingList"
@@ -96,93 +92,9 @@
                     />
                   </draggable>
                 </template>
-                <!-- 模块结构展示 -->
-                <template v-else>
-                  <template v-for='(moduleItem,i) in drawingList'>
-                     <el-collapse v-if='moduleItem.module' :key='i' v-model='activeNames'>
-                      <el-collapse-item :title="moduleItem.module" :name="moduleItem.module" 
-                       :class="{[moduleItem.class]:true,'active-el-collapse':activeModuleIndex==i}" 
-                      @click.native='activeModuleItem(i)'>
-                         <draggable class="drawing-board" :list="moduleItem.params" :animation="340" group="componentsGroup">
-                            <draggable-item
-                              v-for="(item, index) in moduleItem.params"
-                              :key="item.renderKey"
-                              :drawing-list="moduleItem.params"
-                              :current-item="item"
-                              :index="index"
-                              :active-id="activeId"
-                              :form-conf="formConf"
-                              @activeItem="activeFormItem($event,index)"
-                              @copyItem="drawingItemCopy"
-                              @deleteItem="drawingItemDelete"
-                            />
-                        </draggable>
-                      </el-collapse-item>
-                     </el-collapse>
-                      <draggable class="drawing-board" v-else :list="moduleItem.params" :animation="340" group="componentsGroup" :key='i'>
-                          <draggable-item
-                            v-for="(item, index) in moduleItem.params"
-                            :key="item.renderKey"
-                            :drawing-list="moduleItem.params"
-                            :current-item="item"
-                            :index="index"
-                            :active-id="activeId"
-                            :form-conf="formConf"
-                            @activeItem="activeFormItem($event,index)"
-                            @copyItem="drawingItemCopy"
-                            @deleteItem="drawingItemDelete"
-                          />
-                      </draggable>
-                  </template>
-                </template>
                 <div v-show="!drawingList.length" class="empty-info">
                   从左侧拖入或点选组件进行表单设计
                 </div>
-                <template v-if='formConf.showDescPop&&formConf.descPopSetting'>
-                    <div @click='showDescPop=true' class="desc-btn" v-if='!showDescPop'>
-                        <i class="fa fa-info-circle" aria-hidden="true" ></i>
-                        <span>{{formConf.descPopSetting.popBtnTitle?formConf.descPopSetting.popBtnTitle:'注意事项'}}</span>
-                    </div>
-                    <Popup :setting="formConf.descPopSetting" v-model='showDescPop'/>
-                </template>
-                <!-- 新建表单按钮 -->
-                <div class="btns"  
-                  v-if='!isFlow&&Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length'
-                  :class="{'no-space':Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length>2}">
-                    <el-button type="primary">提交</el-button>
-                    <template v-for='(btn,i) of formConf.customerBtns' >
-                        <el-button type="primary" plain  :style='btn.style' :key='i'>{{btn.title}} </el-button> 
-                    </template>
-                    <el-button type="default">返回</el-button>
-                </div> 
-                <!-- 流程审批按钮 -->
-                <div class="btns" v-if="isFlow" :class="{'no-space':Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length>2}">
-                  <!-- 同意 -->
-                  <template v-if="formConf.fixBtns&&formConf.fixBtns.agree">
-                      <el-button type="primary"  v-if="formConf.fixBtns.agree.show" :icon="formConf.fixBtns.agree.icon" >
-                          {{formConf.fixBtns.agree.title}}
-                      </el-button>
-                  </template>
-                  <el-button type="primary" v-else icon="el-icon-check" >同意</el-button>
-                  <!-- 驳回 -->
-                  <template v-if="formConf.fixBtns&&formConf.fixBtns.refuse">
-                      <el-button type="primary" v-if="formConf.fixBtns.refuse.show"  :icon="formConf.fixBtns.refuse.icon">
-                          {{formConf.fixBtns.refuse.title}}
-                      </el-button>
-                  </template>
-                  <el-button type="primary"  v-else icon="el-icon-close">驳回</el-button>
-                  <!-- 转办 -->
-                  <template v-if="formConf.fixBtns&&formConf.fixBtns.transfer">
-                      <el-button type="primary"  v-if="formConf.fixBtns.transfer.show" :icon="formConf.fixBtns.transfer.icon">
-                          {{formConf.fixBtns.transfer.title}}
-                      </el-button>
-                  </template>
-                  <el-button type="primary" v-else icon="el-icon-right">转办</el-button>
-                  <!-- 自定义按钮 -->
-                  <template v-for='(btn,i) of formConf.customerBtns' >
-                      <el-button type="primary" plain  :style='btn.style' :key='i' :icon="btn.icon">{{btn.title}} </el-button> 
-                  </template>
-                </div> 
               </el-scrollbar>
             </el-form>
           </el-row>
@@ -197,6 +109,7 @@
       :show-field="!!drawingList.length"
       :draw-list-obj ="drawingListObj"
       @tag-change="tagChange"
+      :onlyComp="true"
     />
 
     <css-drawer
@@ -212,9 +125,9 @@
     <json-drawer
       size="60%"
       :visible.sync="jsonDrawerVisible"
-      :json-str="JSON.stringify(formData)"
-      @refresh="refreshJson"
+      :json-str="JSON.stringify(allParams)"
       @jsonChange = "jsonChange"
+     
     />
    
     <input id="copyNode" type="hidden">
@@ -252,7 +165,7 @@ import {
 } from '@/utils/db'
 import loadBeautifier from '@/utils/loadBeautifier'
 import Popup from '@/components/popup'
-import {GET_JSON,SAVE_JSON} from '@/utils/api'
+import {GET_JSON,SAVE_JSON,GET_JSON_PUBLIC,SAVE_JSON_PUBLIC} from '@/utils/api'
 import Request from '@/utils/request'
 import {Toast} from 'mint-ui'
 let beautifier
@@ -276,6 +189,7 @@ export default {
   },
   data() {
     return {
+      allParams:[],
       jsData:'',
       cssData:'',
       systemid:'',
@@ -284,7 +198,7 @@ export default {
       showDescPop:false,
       logo,
       idGlobal,
-      formConf:this.isFlow?formFlowConf:formConf,
+      formConf:formConf,
       inputComponents,
       selectComponents,
       otherComponents,
@@ -319,33 +233,17 @@ export default {
           list: showComponets
         },
         {
-          title:'明细组件',
-          list:detailComponents,
-        },
-        {
           title: '其他组件',
-          list: otherComponents
+          list: otherComponents.slice(0,otherComponents.length-1)
         },
+        // {
+        //   title:'明细组件',
+        //   list:detailComponents,
+        // }
       ]
     }
   },
   computed: {
-    isFlow(){
-      return this.$route.name=='flow'
-    },
-    activeNames: {
-      get: function() {
-        let res = []
-        if(this.formConf.showAsModule){
-          res = this.drawingList.filter(it=>it.active).map(it=>it.module)
-        }
-        return res
-      },
-      set: function() {}
-    }
-    // drawingListObj(){
-    //   return {list:this.drawingList}
-    // }
   },
   watch: {
     drawingListObj:{
@@ -392,18 +290,11 @@ export default {
       //回写json
       if(this.$route.query.orunid){
         try{
-          let res =  await Request.post(GET_JSON,{orunid:this.$route.query.orunid})
+          let res =  await Request.post(GET_JSON_PUBLIC,{orunid:this.$route.query.orunid})
           this.initDrawing = res.htmlJson
           this.cssData = res.css
           this.jsData = res.js
           this.systemid = res.systemid
-          sessionStorage.setItem('systemid',res.systemid)
-          if(this.initDrawing.modules){
-            this.$set(this.formConf,"showAsModule",true)
-          }
-          else{
-            this.$set(this.formConf,"showAsModule",false)
-          }
         }
         catch(e){
           console.log(e)
@@ -419,71 +310,33 @@ export default {
   },
   methods: {
     initJsonData(){
-      //流程配置默认
-      if(this.isFlow&&(!this.initDrawing||!Object.keys(this.initDrawing).length)){
-        this.initDrawing = drawingDefalutFlow
-      }
-      if(this.initDrawing&&Object.keys(this.initDrawing).length){
-        if(Array.isArray(this.initDrawing['params'])){
-          this.initDrawing['params'].forEach((param,i)=>{
-            if(param.type!=='detail'){
-              //非明细
-              let res = this.settingInitJson(param)
-              this.drawingList.push(res)
+    if(this.initDrawing&&Array.isArray(this.initDrawing)){
+        this.initDrawing.forEach((param,i)=>{
+        if(param.type!=='detail'){
+            //非明细
+            let res = this.settingInitJson(param)
+            this.drawingList.push(res)
+        }
+        else{
+            //明细
+            let obj = {}
+            Object.keys(param).forEach(key=>{
+            if(key!=='params'){
+                obj[key]=param[key]
             }
             else{
-              //明细
-              let obj = {}
-              Object.keys(param).forEach(key=>{
-                if(key!=='params'){
-                  obj[key]=param[key]
-                }
-                else{
-                  obj[key] = param[key].map(item=>{
-                    return this.settingInitJson(item)
-                    // {
-                    //   __config__:deepClone(item)
-                    // }
-                  })
-                }
-              })
-              this.drawingList.push({__config__:{...obj},layout:'rowFormItem'})
-            }
-          })
-          this.drawingList.forEach(it=>{this.createIdAndKey(it)})
-        }
-        else if(Array.isArray(this.initDrawing['modules'])){
-          this.initDrawing["modules"].forEach((moduleItem,i)=>{
-            let paramsList = []
-            moduleItem['params'].forEach((param,i)=>{
-              if(param.type!=='detail'){
-                //非明细
-                let res = this.settingInitJson(param)
-                paramsList.push(res)
-              }
-              else{
-                //明细
-                let obj = {}
-                Object.keys(param).forEach(key=>{
-                  if(key!=='params'){
-                    obj[key]=param[key]
-                  }
-                  else{
-                    obj[key] = param[key].map(item=>{
-                      return this.settingInitJson(item)
-                      // {
-                      //   __config__:deepClone(item)
-                      // }
-                    })
-                  }
+                obj[key] = param[key].map(item=>{
+                return this.settingInitJson(item)
+                // {
+                //   __config__:deepClone(item)
+                // }
                 })
-                paramsList.push({__config__:{...obj},layout:'rowFormItem'})
-              }
+            }
             })
-            paramsList.forEach(it=>{this.createIdAndKey(it)})
-            this.drawingList.push({module:moduleItem.module,active:moduleItem.active,class:moduleItem.class,params:paramsList})
-          })
+            this.drawingList.push({__config__:{...obj},layout:'rowFormItem'})
         }
+        })
+        this.drawingList.forEach(it=>{this.createIdAndKey(it)})
         
         Object.keys(this.initDrawing).forEach((key,i)=>{
           if(key!=='params'&&key!=='modules'){
@@ -505,19 +358,12 @@ export default {
 
       this.drawingListObj={list:this.drawingList}
 
-      //默认选中第一项
-      if(!this.formConf.showAsModule){
+        //默认选中第一项
         this.activeFormItem(this.drawingList[0])
-      }
-      else{
-        this.activeModuleIndex=0
-        if(this.drawingList.length&&this.drawingList[0].params.length){
-          this.activeFormItem(this.drawingList[0].params[0])
-        }
-      }
-      loadBeautifier(btf => {
-        beautifier = btf
-      })
+
+        loadBeautifier(btf => {
+            beautifier = btf
+        })
     },
     settingInitJson(param){
       let obj = {}
@@ -595,22 +441,13 @@ export default {
         this.activeData.__config__.params.push(clone)
       }
       else{
-        if(!this.formConf.showAsModule){
           this.drawingList.push(clone)
           this.activeFormItem(clone)
-        }
-        else{
-          if(!Array.isArray(this.drawingList[this.activeModuleIndex].params)){
-            this.drawingList[this.activeModuleIndex].params=[]
-          }
-          this.drawingList[this.activeModuleIndex].params.push(clone)
-        }
       }
     },
     cloneComponent(origin) {
       const clone = deepClone(origin)
       const config = clone.__config__
-      config.span = this.formConf.span // 生成代码时，会根据span做精简判断
       this.createIdAndKey(clone)
       clone.placeholder !== undefined && (clone.placeholder)
       tempActiveData = clone
@@ -633,7 +470,6 @@ export default {
       return item
     },
     AssembleFormData() {
-      if(!this.formConf.showAsModule){
         let draList = this.drawingList.map(it=>it.__config__)
         let resultList = deepClone(draList)
         resultList.forEach(it=>{
@@ -650,43 +486,7 @@ export default {
             })
           }
         }) 
-        // console.log(3333,resultList)     
-        this.formData = {
-          params: resultList,
-          ...this.formConf
-        }
-      }
-      else{
-        let resultList =[]
-        this.drawingList.forEach(moduleItem=>{
-           let obj = deepClone(moduleItem)
-           if(!Array.isArray(obj.params)){
-             obj.params = []
-           }
-           let params = obj.params.map(item=>item.__config__)
-           params.forEach(it=>{
-              delete it.formId
-              delete it.renderKey
-              delete it.componentName
-              if(it.type=='detail'){
-                if(!it.params)it.params=[]
-                it.params = it.params.map(it=>it.__config__)
-                it.params.forEach(item=>{
-                  delete item.formId
-                  delete item.renderKey
-                  delete item.componentName
-                })
-              }
-           })
-           obj.params = params
-           resultList.push(obj)
-        })
-        this.formData = {
-          modules: resultList,
-          ...this.formConf
-        }
-        console.log(1111111,this.formData)
-      }
+        this.allParams = resultList
     },
     generate(data) {
       const func = this[`exec${titleCase(this.operationType)}`]
@@ -696,11 +496,6 @@ export default {
     execRun(data) {
       this.AssembleFormData()
       this.drawerVisible = true
-    },
-    execDownload(data) {
-      const codeStr = this.generateCode()
-      const blob = new Blob([codeStr], { type: 'text/plain;charset=utf-8' })
-      saveAs(blob, data.fileName)
     },
     empty() {
       this.$confirm('确定要清空所有组件吗？', '提示', { type: 'warning' }).then(
@@ -722,9 +517,7 @@ export default {
       this.$nextTick(() => {
         const len = this.drawingList.length
         if (len) {
-          if(!this.formConf.showAsModule){
             this.activeFormItem(this.drawingList[len - 1])
-          }
         }
       })
     },
@@ -748,7 +541,7 @@ export default {
     },
     async confirmJson(){
       this.AssembleFormData()
-      let jsonString = JSON.stringify(this.formData)
+      let jsonString = JSON.stringify(this.allParams)
       let beautifierJson = beautifier.js(jsonString, beautifierConf.js)
       let beautifierCss = this.cssData// beautifier.js(this.cssData, beautifierConf.js)
       let beautifierJs =  beautifier.js(this.jsData, beautifierConf.js)
@@ -767,8 +560,8 @@ export default {
       }
 
       try{
-          let res =  await Request.post(SAVE_JSON,{orunid:this.$route.query.orunid,
-          formJson:beautifierJson,systemid:this.systemid,css:beautifierCss,js:beautifierJs})
+          let res = await Request.post(SAVE_JSON_PUBLIC,{orunid:this.$route.query.orunid,
+            formJson:beautifierJson,systemid:this.systemid,css:beautifierCss,js:beautifierJs})
           if(res.code==0){
             this.$message({ message: '保存成功！', type: 'success' });
           }
@@ -780,52 +573,6 @@ export default {
           console.log(e)
           Toast({  message:e, position:'middle', duration:3000 })
         }
-    },
-    //构造流程引擎json
-    buildReadJson(beautifierJson){
-      let json = JSON.parse(beautifierJson)
-      let resAry = []
-      if(this.formConf.showAsModule){
-        if(Array.isArray(json.modules)&&json.modules.length){
-          json.modules.forEach((moduleItem,index)=>{
-            let ary = []
-            let obj = {
-              "groupIndex":index,
-              "groupLabel":moduleItem.module?moduleItem.module:'其他信息',
-              "groupType":"1",
-              "details":[ary]
-            }
-            if(Array.isArray(moduleItem.params)&&moduleItem.params.length){
-              moduleItem.params.forEach(it=>{
-                if(['hidden','html','fileUpload',"detail"].indexOf(it.type)==-1){
-                  ary.push({ "label":it.label,"value":it.key})
-                }
-              })
-            }
-            resAry.push(obj)
-          })
-        }
-      }
-      else{
-        let ary = []
-        let obj = {
-          "groupIndex":0,
-          "groupLabel":"详细信息",
-          "groupType":"1",
-          "details":[ary]
-        }
-        if(Array.isArray(json.params)&&json.params.length){
-          json.params.forEach(it=>{
-            if(['hidden','html','fileUpload',"detail"].indexOf(it.type)==-1){
-              ary.push({ "label":it.label,"value":it.key})
-            }
-          })
-        }
-        resAry.push(obj)
-      }
-      let readJson=beautifier.js(JSON.stringify(resAry), beautifierConf.js)
-      console.log("readJson...",readJson)
-      return readJson
     },
     download() {
       this.dialogVisible = true
@@ -872,18 +619,6 @@ export default {
         })
       }
     },
-    refreshJson(data) {
-      // if(!this.formConf.showAsModule){
-      //   this.drawingList = deepClone(data.params)
-      //   delete data.params
-      //   this.formConf = data
-      // }
-      // else{
-      //   this.drawingList = deepClone(data)
-      //   delete data.modules
-      //   this.formConf = data
-      // }
-    },
     jsonChange(newjson){
       // console.log('jsonChange',newjson)
       this.drawingList = []
@@ -893,12 +628,7 @@ export default {
     goPreview(){
       let a = document.createElement('a')
       a.setAttribute('target','_blank')
-      if(this.isFlow){
-        a.href = "http://mobileproxy.h3c.com:8000/dev/work-flow/#/workflow-detail-form?orunid="+this.$route.query.orunid
-      }
-      else{
-        a.href = "http://mobileproxy.h3c.com:8000/dev/work-flow/#/workflow-form/"+this.$route.query.orunid
-      }
+    a.href = "http://mobileproxy.h3c.com:8000/dev/work-flow/#/workflow-form/"+this.$route.query.orunid
       a.click()
     }
   }

@@ -2,7 +2,7 @@
   <div class="right-board" >
     <el-tabs v-model="currentTab" class="center-tabs">
       <el-tab-pane label="组件属性" name="field" />
-      <el-tab-pane label="表单属性" name="form" />
+      <el-tab-pane label="表单属性" name="form" v-if="!onlyComp"/>
     </el-tabs>
     <div class="field-box" v-if='activeData&&activeData.__config__'>
       <a
@@ -15,7 +15,21 @@
       </a>
       <el-scrollbar class="right-scrollbar">
         <!-- 组件属性 -->
-        <el-form v-show="currentTab==='field' && showField &&activeData.__config__.type!='detail'" size="small" label-width="150px">
+        <el-form v-show="currentTab==='field' && showField &&activeData.__config__.type=='reference'" size="small" label-width="150px">
+            <el-divider>基本属性</el-divider>
+            <el-form-item  label="组件类型">
+              <el-input v-model="activeData.__config__.type" readonly />
+            </el-form-item>
+            <el-form-item  label="组件名称">
+              <el-input v-model="activeData.__config__.label" readonly />
+            </el-form-item>
+            <el-form-item  label="引用组件编号">
+              <el-select v-model="activeData.__config__.referId" placeholder="请选引用组件" :style="{ width: '100%' }" clearable @click.native="referenceClick">
+                <el-option :label="item.moduleName" :value="item.id"  v-for="(item,i) of referenceList" :key="i"/>
+              </el-select>
+            </el-form-item>
+        </el-form>
+        <el-form v-show="currentTab==='field' && showField &&activeData.__config__.type!='detail'&&activeData.__config__.type!='reference'" size="small" label-width="150px">
           <!-- <el-form-item v-if="activeData.__config__.changeTag" label="组件类型">
             <el-select
               v-model="activeData.__config__.type"
@@ -678,7 +692,9 @@ import {
 } from '@/components/generator/config'
 import { saveFormConf } from '@/utils/db'
 import drawingDefalut from '@/components/generator/drawingDefalut'
-
+import {SELECT_PUBLIC_FORM} from '@/utils/api'
+import Request from '@/utils/request'
+import {Toast} from 'mint-ui'
 // 使changeRenderKey在目标组件改变时可用
 const needRerenderList = ['tinymce']
 
@@ -688,14 +704,15 @@ export default {
     IconsDialog,
     draggable
   },
-  props: ['showField', 'activeData', 'formConf','drawListObj'],
+  props: ['showField', 'activeData', 'formConf','drawListObj','onlyComp'],
   data() {
     return {
       currentTab: 'field',
       currentNode: null,
       dialogVisible: false,
       iconsVisible: false,
-      currentIconModel: {}
+      currentIconModel: {},
+      referenceList:[]
     }
   },
   computed: {
@@ -1040,6 +1057,25 @@ export default {
       catch(e){
         this.formConf.showAsModule=!this.formConf.showAsModule
       }
+    },
+    async referenceClick(){
+       if(!this.hasCallRefer){
+          this.hasCallRefer = true
+          this.referenceList = []
+          try{
+            let res =  await Request.post(SELECT_PUBLIC_FORM,{orunid:this.$route.query.orunid,systemid:sessionStorage.getItem('systemid')})
+            this.referenceList = res.rows
+          }
+          catch(e){
+            this.hasCallRefer = false
+            console.log(e)
+            Toast({
+                  message:e,
+                  position:'middle',
+                  duration:3000
+              })
+          }
+        }
     }
   }
 }

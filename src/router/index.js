@@ -15,6 +15,11 @@ const routes = [
     name: 'flow',
     component: Home
   },
+  {
+    path: '/public',
+    name: 'public',
+    component:()=>import ('../views/index/Public'),
+  },
 ]
 
 const router = new VueRouter({
