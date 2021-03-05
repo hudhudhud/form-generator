@@ -234,13 +234,13 @@ export default {
           list: showComponets
         },
         {
+          title:'明细组件',
+          list:detailComponents,
+        },
+        {
           title: '其他组件',
           list: otherComponents.slice(0,otherComponents.length-1)
         },
-        {
-          title:'明细组件',
-          list:detailComponents,
-        }
       ]
     }
   },
