@@ -444,6 +444,30 @@ export const detailComponents =[
     },
     modeType:'复杂弹框明细',
     layout: "rowFormItem",
+  },
+  {
+    __config__: {
+      "type":"detail", //必填，组件类型
+      "key":"", //必填，字段名称
+      "title":"轮播显示明细",
+      "mode":"slider",//必填，simple:1个字段，mutiple:多个字段，pop:弹出页面,
+      "params":[],
+    },
+    modeType:'轮播显示明细',
+    tip:'只支持显示型组件',
+    layout: "rowFormItem",
+  },
+  {
+    __config__: {
+      "type":"detail", //必填，组件类型
+      "key":"", //必填，字段名称
+      "title":"表格显示明细",
+      "mode":"table",//必填，simple:1个字段，mutiple:多个字段，pop:弹出页面,
+      "params":[],
+    },
+    modeType:'表格显示明细',
+    tip:'只支持显示型组件',
+    layout: "rowFormItem",
   }
 ]
 

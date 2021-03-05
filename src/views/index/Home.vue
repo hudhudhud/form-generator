@@ -32,12 +32,13 @@
                 @click="addComponent(element)"
               >
                 <div class="components-body">
-                  <svg-icon :icon-class="element.__config__.type" />
+                  <!-- <svg-icon :icon-class="element.__config__.type" /> -->
                   <span v-if='element.__config__.type=="hidden"'>hidden组件</span>
                   <span v-else-if='element.__config__.type=="detail"'>
                     {{element.modeType}}
                   </span>
                   <span v-else>{{element.__config__.label}}</span>
+                  <span v-if="element.tip" style='font-size:10px;color:red;display:block;'>({{element.tip}})</span>
                 </div>
               </div>
             </draggable>
