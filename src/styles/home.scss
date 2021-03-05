@@ -225,7 +225,7 @@ $lighterBlue: #409EFF;
     &.simple{
       min-height: 50px;
     }
-    &.mutiple{
+    &.mutiple,&.slider,&.table{
       min-height: 200px;
     }
     &.pop{
