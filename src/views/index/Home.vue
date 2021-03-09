@@ -157,7 +157,7 @@
                     <el-button type="default">返回</el-button>
                 </div> 
                 <!-- 流程审批按钮 -->
-                <div class="btns" v-if="isFlow" :class="{'no-space':Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length>2}">
+                <div class="btns" v-if="isFlow" :class="{'no-space':Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length>2}" @click="btnClick">
                   <!-- 同意 -->
                   <template v-if="formConf.fixBtns&&formConf.fixBtns.agree">
                       <el-button type="primary"  v-if="formConf.fixBtns.agree.show" :icon="formConf.fixBtns.agree.icon" >
@@ -198,6 +198,7 @@
       :show-field="!!drawingList.length"
       :draw-list-obj ="drawingListObj"
       @tag-change="tagChange"
+      :toFormTab = toFormTab
     />
 
     <css-drawer
@@ -277,6 +278,7 @@ export default {
   },
   data() {
     return {
+      toFormTab:'',
       jsData:'',
       cssData:'',
       systemid:'',
@@ -576,9 +578,17 @@ export default {
       if(!currentItem)return
       this.activeData = currentItem
       this.activeId = currentItem.__config__.formId
+      this.toFormTab = 'field'
     },
     activeModuleItem(index){
       this.activeModuleIndex = index
+      this.toFormTab = 'form'
+      this.$nextTick(()=>{
+        document.querySelectorAll('.el-scrollbar__wrap')[3].scrollTo(0,10000)
+      })
+    },
+    btnClick(){
+      this.toFormTab = 'form'
     },
     onEnd(obj) {
       if (obj.from !== obj.to) {

@@ -24,9 +24,12 @@
               <el-input v-model="activeData.__config__.label" readonly />
             </el-form-item>
             <el-form-item  label="引用组件编号">
-              <el-select v-model="activeData.__config__.referId" placeholder="请选引用组件" :style="{ width: '100%' }" clearable @click.native="referenceClick">
-                <el-option :label="item.moduleName" :value="item.id"  v-for="(item,i) of referenceList" :key="i"/>
+              <el-select v-model="activeData.__config__.referId" placeholder="请选引用组件" value-key="id" :style="{ width: '100%' }" clearable @click.native="referenceClick" @change="referenceChange">
+                <el-option :label="item.moduleName+' '+item.id" :value="item"  v-for="(item,i) of referenceList" :key="i"/>
               </el-select>
+            </el-form-item>
+            <el-form-item  label="引用组件名称">
+              <el-input v-model="activeData.__config__.referName" readonly />
             </el-form-item>
         </el-form>
         <el-form v-show="currentTab==='field' && showField &&activeData.__config__.type!='detail'&&activeData.__config__.type!='reference'" size="small" label-width="150px">
@@ -674,6 +677,14 @@
               <el-switch v-model="activeData.__config__.editDisable" />
             </el-form-item>
           </template>
+          <template v-if="['slider','table'].indexOf(activeData.__config__.mode)!=-1">
+            <el-form-item  label="显示方式">
+              <el-radio-group v-model="activeData.__config__.mode">
+                <el-radio label="slider">轮播</el-radio>
+                <el-radio label="table">表格</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </template>
         </el-form>
       </el-scrollbar>
     </div>
@@ -706,7 +717,7 @@ export default {
     IconsDialog,
     draggable
   },
-  props: ['showField', 'activeData', 'formConf','drawListObj','onlyComp'],
+  props: ['showField', 'activeData', 'formConf','drawListObj','onlyComp',"toFormTab"],
   data() {
     return {
       currentTab: 'field',
@@ -808,6 +819,13 @@ export default {
     //   },
     //   // immediate:true,
     // }
+    toFormTab:{
+      handler(val) {
+        if(val){
+          this.currentTab = val
+        }
+      },
+    }
   },
   methods: {
     setIcon(val) {
@@ -1078,6 +1096,10 @@ export default {
               })
           }
         }
+    },
+    referenceChange(item){
+      this.activeData.__config__.referId = item.id
+      this.activeData.__config__.referName = item.moduleName
     }
   }
 }
