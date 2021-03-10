@@ -106,6 +106,9 @@
           <el-form-item  label="是否显示" v-if='["hidden"].indexOf(activeData.__config__.type)==-1'>
             <el-switch v-model="activeData.__config__.show" />
           </el-form-item> 
+          <el-form-item  label="不需要提交到表单">
+            <el-switch v-model="activeData.__config__.excludeSubmit"  />
+          </el-form-item>
           <el-form-item  label="回调函数名称" v-if='["hidden","fileUpload","cascaderselect","html","label"].indexOf(activeData.__config__.type)==-1'>
             <el-input v-model="activeData.__config__.callback" placeholder="请输入回调函数名称" />
           </el-form-item>
@@ -665,6 +668,9 @@
           </el-form-item> -->
           <el-form-item  label="提交前调用函数名称" v-if='activeData.__config__.mode=="pop"'>
            <el-input v-model="activeData.__config__.beforeSave" placeholder="请输入提交函数" />
+          </el-form-item>
+          <el-form-item  label="不需要提交到表单">
+            <el-switch v-model="activeData.__config__.excludeSubmit"  />
           </el-form-item>
           <template  v-if="['slider','table'].indexOf(activeData.__config__.mode)==-1">
             <el-form-item label="是否禁止明细新增">
