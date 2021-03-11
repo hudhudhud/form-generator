@@ -77,7 +77,7 @@
               :disabled="formConf.disabled"
               :label-width="formConf.labelWidth + 'px'"
             > 
-              <el-scrollbar class="form-container"  :class="{'show':(Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length)||isFlow,}">
+              <el-scrollbar class="form-container"  :class="{'show':(Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length)||isFlow,'module-bkg':formConf.showAsModule}">
                  <div v-if='formConf.descHtml' v-html='formConf.descHtml' class="desc-html">
                 </div>
                 <!-- 整体结构展示 -->
@@ -104,6 +104,12 @@
                       <el-collapse-item :title="moduleItem.module" :name="moduleItem.module" 
                        :class="{[moduleItem.class]:true,'active-el-collapse':activeModuleIndex==i}" 
                       @click.native='activeModuleItem(i)'>
+                        <template slot="title">
+                            <div class="collapse-title">
+                              <img :src="moduleImg.find(it=>it.imgName==moduleItem.img).img" alt="" v-if="moduleItem.img&&moduleImg.find(it=>it.imgName==moduleItem.img)">
+                              <span>{{moduleItem.module}}</span>
+                            </div>
+                        </template>
                          <draggable class="drawing-board" :list="moduleItem.params" :animation="340" group="componentsGroup">
                             <draggable-item
                               v-for="(item, index) in moduleItem.params"
@@ -147,41 +153,53 @@
                     <Popup :setting="formConf.descPopSetting" v-model='showDescPop'/>
                 </template>
                 <!-- 新建表单按钮 -->
-                <div class="btns"  
+                <div class="btns"   @click="btnClick"
                   v-if='!isFlow&&Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length'
                   :class="{'no-space':Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length>2}">
-                    <el-button type="primary">提交</el-button>
+                    <el-button plain class='bottom-btn-pre' icon="el-icon-back">返回</el-button>
+                    <el-button plain class='bottom-btn-pre' icon="el-icon-check">提交</el-button>
                     <template v-for='(btn,i) of formConf.customerBtns' >
-                        <el-button type="primary" plain  :style='btn.style' :key='i'>{{btn.title}} </el-button> 
+                        <el-button  plain class='bottom-btn-pre'  :style='btn.style' :key='i' :icon="btn.icon">{{btn.title}} </el-button> 
                     </template>
-                    <el-button type="default">返回</el-button>
                 </div> 
                 <!-- 流程审批按钮 -->
                 <div class="btns" v-if="isFlow" :class="{'no-space':Array.isArray(formConf.customerBtns)&&formConf.customerBtns.length>2}" @click="btnClick">
                   <!-- 同意 -->
                   <template v-if="formConf.fixBtns&&formConf.fixBtns.agree">
-                      <el-button type="primary"  v-if="formConf.fixBtns.agree.show" :icon="formConf.fixBtns.agree.icon" >
-                          {{formConf.fixBtns.agree.title}}
+                      <el-button plain class='bottom-btn'  v-if="formConf.fixBtns.agree.show" >
+                        <img src="../../assets/approve-agree.png" />
+                        <span>{{formConf.fixBtns.agree.title}}</span>
                       </el-button>
                   </template>
-                  <el-button type="primary" v-else icon="el-icon-check" >同意</el-button>
+                  <el-button plain class='bottom-btn' v-else >
+                    <img src="../../assets/approve-agree.png" />
+                    <span>同意</span>
+                  </el-button>
                   <!-- 驳回 -->
                   <template v-if="formConf.fixBtns&&formConf.fixBtns.refuse">
-                      <el-button type="primary" v-if="formConf.fixBtns.refuse.show"  :icon="formConf.fixBtns.refuse.icon">
-                          {{formConf.fixBtns.refuse.title}}
+                      <el-button plain class='bottom-btn' v-if="formConf.fixBtns.refuse.show">
+                        <img src="../../assets/approve-refuse.png" />
+                        <span>{{formConf.fixBtns.refuse.title}}</span>
                       </el-button>
                   </template>
-                  <el-button type="primary"  v-else icon="el-icon-close">驳回</el-button>
+                  <el-button plain class='bottom-btn'  v-else>
+                    <img src="../../assets/approve-refuse.png" />
+                    <span>驳回</span>
+                  </el-button>
                   <!-- 转办 -->
                   <template v-if="formConf.fixBtns&&formConf.fixBtns.transfer">
-                      <el-button type="primary"  v-if="formConf.fixBtns.transfer.show" :icon="formConf.fixBtns.transfer.icon">
-                          {{formConf.fixBtns.transfer.title}}
+                      <el-button plain class='bottom-btn'  v-if="formConf.fixBtns.transfer.show">
+                        <img src="../../assets/transmit-icon.png" />
+                        <span>{{formConf.fixBtns.transfer.title}}</span>
                       </el-button>
                   </template>
-                  <el-button type="primary" v-else icon="el-icon-right">转办</el-button>
+                  <el-button plain class='bottom-btn' v-else>
+                     <img src="../../assets/transmit-icon.png" />
+                     <span>转办</span>
+                  </el-button>
                   <!-- 自定义按钮 -->
                   <template v-for='(btn,i) of formConf.customerBtns' >
-                      <el-button type="primary" plain  :style='btn.style' :key='i' :icon="btn.icon">{{btn.title}} </el-button> 
+                      <el-button plain class='bottom-btn' :style='btn.style' :key='i' :icon="btn.icon">{{btn.title}} </el-button> 
                   </template>
                 </div> 
               </el-scrollbar>
@@ -257,6 +275,7 @@ import Popup from '@/components/popup'
 import {GET_JSON,SAVE_JSON} from '@/utils/api'
 import Request from '@/utils/request'
 import {Toast} from 'mint-ui'
+import {moduleImg} from '@/utils/common'
 let beautifier
 const emptyActiveData = { style: {}, autosize: {} }
 let oldActiveId
@@ -278,6 +297,7 @@ export default {
   },
   data() {
     return {
+      moduleImg,
       toFormTab:'',
       jsData:'',
       cssData:'',
@@ -484,7 +504,7 @@ export default {
               }
             })
             paramsList.forEach(it=>{this.createIdAndKey(it)})
-            this.drawingList.push({module:moduleItem.module,active:moduleItem.active,class:moduleItem.class,params:paramsList})
+            this.drawingList.push({module:moduleItem.module,active:moduleItem.active,img:moduleItem.img,class:moduleItem.class,params:paramsList})
           })
         }
         
@@ -951,6 +971,9 @@ export default {
          &.show{
           padding-bottom:60px;
         }
+        &.module-bkg{
+          background-color:#F4F5F8
+        }
       }
       .actived{
         // border:1px solid red;
@@ -999,8 +1022,30 @@ export default {
         
     }
 }
+.collapse-title{
+    font-size: 16px;
+    font-family: PingFangSC-Medium, PingFang SC;
+    font-weight: 500;
+    color: #333333;
+    i,img{ margin-right:10px;width:15px;height:15px;}
+}
 </style>
 <style lang='scss'>
+.bottom-btn-pre{
+  border:none;
+}
+ .bottom-btn{
+  border:none;
+  >span{
+    display:flex;
+    align-items:center;
+  }
+  img{
+    width:20px;
+    height:18px; 
+    margin-right:10px;
+  }  
+}
 .el-collapse-item{
     padding:10px;
     box-sizing:border-box;
@@ -1013,7 +1058,7 @@ export default {
     box-sizing: border-box;
     font-size: 16px;
     font-weight:bold;
-    background-color:#E5E3E0;
+    background-color:#FEFFFE;
     border-radius:5px;
 }
 .el-collapse-item__wrap{

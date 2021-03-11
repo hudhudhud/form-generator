@@ -536,8 +536,7 @@
               <el-form-item label="按钮名称">
                 <el-input v-model="item.title" placeholder="请输入属性名称" />
               </el-form-item>
-              <el-form-item label="按钮图标">
-                <!-- <el-input v-model="item.icon" placeholder="按钮图标" /> -->
+              <!-- <el-form-item label="按钮图标">
                   <el-input v-model="item.icon" placeholder="请输入按钮图标" >
                     <el-button
                       slot="append"
@@ -547,7 +546,7 @@
                       选择
                     </el-button>
                   </el-input>
-              </el-form-item>
+              </el-form-item> -->
               <el-form-item label="按钮值" style="margin-bottom:0">
                 {{item.type}}
               </el-form-item>
@@ -629,6 +628,16 @@
               </span>
               <el-form-item label="模块名称">
                 <el-input v-model="moduleItem.module" placeholder="请输入模块名称" />
+              </el-form-item>
+              <el-form-item label="模块图标">
+                <el-select v-model="moduleItem.img" placeholder="请选择" clearable>
+                  <el-option :value="it.imgName" v-for="(it,i) of moduleImg" :key="i">
+                    <div class="mod-img-item">
+                      <img :src="it.img" class="mod-img"/>
+                      <span>{{it.imgName}}</span>
+                    </div>
+                  </el-option>
+                </el-select>
               </el-form-item>
               <el-form-item label="是否默认展开">
                 <el-switch v-model="moduleItem.active" />
@@ -714,6 +723,7 @@ import drawingDefalut from '@/components/generator/drawingDefalut'
 import {SELECT_PUBLIC_FORM} from '@/utils/api'
 import Request from '@/utils/request'
 import {Toast} from 'mint-ui'
+import {moduleImg} from '@/utils/common'
 // 使changeRenderKey在目标组件改变时可用
 const needRerenderList = ['tinymce']
 
@@ -731,7 +741,8 @@ export default {
       dialogVisible: false,
       iconsVisible: false,
       currentIconModel: {},
-      referenceList:[]
+      referenceList:[],
+      moduleImg
     }
   },
   computed: {
@@ -1055,6 +1066,7 @@ export default {
           "module":"模块信息",
           "active": true, 
           "class":"",
+          "img":"",
           "params":[]
       })
     },
@@ -1073,7 +1085,8 @@ export default {
                 "module":"模块信息",
                 "active": true, 
                 "class":"",
-                "params":[]
+                "img":"",
+                "params":[],
             })
         }
         else{
@@ -1110,7 +1123,17 @@ export default {
   }
 }
 </script>
-
+<style lang="scss">
+.mod-img-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  .mod-img{
+    width:15px;
+    height:15px;
+  }
+}
+</style>
 <style lang="scss" scoped>
 .right-board {
   // width: 400px;

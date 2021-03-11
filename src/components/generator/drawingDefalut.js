@@ -38,6 +38,7 @@ export const drawingDefalutFlow =
           "module": "申请信息",
           "active": true,
           "style": "background-color:#fff;color:#999",
+          "img":"user",
           "params": [
               {
                   "label": "申请人",
@@ -79,6 +80,7 @@ export const drawingDefalutFlow =
       },
       {
           "module": "审批表单",
+          "img":"apply",
           "active": true,
           "params": [
               {
@@ -97,7 +99,7 @@ export const drawingDefalutFlow =
         "title": "同意",
         "needValid": true,
         "beforeSubmit": "",
-        "icon":"el-icon-check"
+        // "icon":"el-icon-check"
     },
     "reject": {
         "type": "Reject",
@@ -105,7 +107,7 @@ export const drawingDefalutFlow =
         "title": "驳回",
         "needValid": false,
         "beforeSubmit": "",
-        "icon":"el-icon-close"
+        // "icon":"el-icon-close"
     },
     "transfer": {
         "type": "Transfer",
@@ -113,7 +115,7 @@ export const drawingDefalutFlow =
         "title": "转办",
         "needValid": false,
         "beforeSubmit": "",
-        "icon":"el-icon-right"
+        // "icon":"el-icon-right"
     }
   },
   "customerBtns": [],
