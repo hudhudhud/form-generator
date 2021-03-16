@@ -645,6 +645,12 @@
               <el-form-item label="模块样式（class）">
                 <el-input type='textarea' :row='4' v-model="moduleItem.class" placeholder="请输入模块样式" />
               </el-form-item> 
+              <!-- <el-form-item label="模块key值(非必填)">
+                <el-input v-model="moduleItem.moduleKey" placeholder="请输入模块key值" />
+              </el-form-item> -->
+              <el-form-item label="是否显示">
+                <el-switch v-model="moduleItem.show" />
+              </el-form-item>
             </div>
             <div style="margin-left: 20px">
               <el-button icon="el-icon-circle-plus-outline" type="text" @click="addModuleBtn">
@@ -1067,7 +1073,8 @@ export default {
           "active": true, 
           "class":"",
           "img":"",
-          "params":[]
+          "params":[],
+          "show":true
       })
     },
     async showAsModuleChange(val){
@@ -1087,6 +1094,7 @@ export default {
                 "class":"",
                 "img":"",
                 "params":[],
+                "show":true
             })
         }
         else{

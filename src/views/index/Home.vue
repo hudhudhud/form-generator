@@ -504,7 +504,9 @@ export default {
               }
             })
             paramsList.forEach(it=>{this.createIdAndKey(it)})
-            this.drawingList.push({module:moduleItem.module,active:moduleItem.active,img:moduleItem.img,class:moduleItem.class,params:paramsList})
+            this.drawingList.push({module:moduleItem.module,active:moduleItem.active,img:moduleItem.img,class:moduleItem.class,params:paramsList,
+            // key:moduleItem.key,
+            show:moduleItem.show===undefined?true:moduleItem.show})
           })
         }
         
